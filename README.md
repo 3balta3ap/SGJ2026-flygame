@@ -6,7 +6,7 @@
 
 </div>
 
-<h1 align="center">flygame</h1>
+<h1 align="center">flygame (tmp)</h1>
 
 <div align="center">
     <i>Scientific Game Jam Tokyo 2026 Team 3</i>
