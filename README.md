@@ -1,6 +1,7 @@
 <div align="center">
     
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Author](https://img.shields.io/badge/Author-3balta3ap-ff00ff)](https://github.com/3balta3ap)
 
 </div>
 
