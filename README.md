@@ -6,9 +6,9 @@
 
 </div>
 
-<h1 align="center">Scientific Game Jam Tokyo 2026 Team 3</h1>
+<h1 align="center">flygame</h1>
 
 <div align="center">
-    <i> - FlyGame - </i>
+    <i>Scientific Game Jam Tokyo 2026 Team 3</i>
 </div>
 
