@@ -1,0 +1,11 @@
+{
+    "name": "FlyJam.Editor",
+    "rootNamespace": "FlyJam.EditorTools",
+    "references": [
+        "FlyJam.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": false
+}
