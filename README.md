@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./Screenshot_2026-11-22_00-22-13.png" />
+<img src="./coverimg-02.png" />
 
 </div>
 
