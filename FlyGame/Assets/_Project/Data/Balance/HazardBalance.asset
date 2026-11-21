@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98f53c26fcd234682bc62f306d87abf7, type: 3}
+  m_Name: HazardBalance
+  m_EditorClassIdentifier: FlyJam.Hazards::FlyJam.HazardBalance
+  firstDelay: 3
+  intervalStart: 3.5
+  intervalEnd: 1.4
+  maxActive: 6
+  spawnAngleMin: 35
+  spawnAngleMax: 60
+  aimJitter: 15
+  travelRatio: 0.6
+  types:
+  - id: dragonfly
+    weight: 0
+    speedRatio: 0.7
+    chase: 0
+    detectRadius: 0
+    loseRadius: 0
+    turnRate: 0
+    stopOnHit: 2
+  - id: spider
+    weight: 0
+    speedRatio: 0.7
+    chase: 0
+    detectRadius: 0
+    loseRadius: 0
+    turnRate: 0
+    stopOnHit: 2
+  - id: male
+    weight: 100
+    speedRatio: 0.7
+    chase: 1
+    detectRadius: 6
+    loseRadius: 9
+    turnRate: 120
+    stopOnHit: 2
+  - id: acorn
+    weight: 0
+    speedRatio: 1
+    chase: 0
+    detectRadius: 0
+    loseRadius: 0
+    turnRate: 0
+    stopOnHit: 0

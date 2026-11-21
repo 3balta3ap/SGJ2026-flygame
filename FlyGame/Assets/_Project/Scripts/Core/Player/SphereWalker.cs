@@ -35,6 +35,8 @@ namespace FlyJam
         public float TimeInState { get; private set; }
         public float CurrentSpeed { get; private set; }
         public float SignedSpeed { get; private set; }
+        /// Base move speed before SpeedMultiplier (enemies use it as "player max speed").
+        public float MoveSpeed => moveSpeed;
         public float SpeedMultiplier { get; set; } = 1f;
         /// Whether an ability currently overrides movement (e.g., Dodge).
         public bool IsOverridden => overrides.Count > 0;

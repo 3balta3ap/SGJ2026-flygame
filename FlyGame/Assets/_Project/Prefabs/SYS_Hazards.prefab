@@ -201,13 +201,16 @@ MonoBehaviour:
   planet: {fileID: 0}
   player: {fileID: 0}
   session: {fileID: 0}
-  prefab: {fileID: 1033967625753692495, guid: 735f6c68a11cd431082dc157680b3824, type: 3}
-  firstDelay: 3
-  intervalStartEnd: {x: 3.5, y: 1.4}
-  speedRange: {x: 3, y: 5}
-  spawnAngle: {x: 35, y: 60}
-  aimJitter: 15
-  maxActive: 6
+  balance: {fileID: 11400000, guid: 82281181bcb5c4f22b6145b758268839, type: 2}
+  prefabs:
+  - id: dragonfly
+    prefab: {fileID: 1033967625753692495, guid: 46855e0c6f33841bd9cd12b6bed710cc, type: 3}
+  - id: spider
+    prefab: {fileID: 1033967625753692495, guid: 1be4e68aa3f4d45768159d1b0afa0206, type: 3}
+  - id: male
+    prefab: {fileID: 1033967625753692495, guid: 489aa39d8b5264d6da8c25840a15fc84, type: 3}
+  - id: acorn
+    prefab: {fileID: 1033967625753692495, guid: 735f6c68a11cd431082dc157680b3824, type: 3}
 --- !u!114 &5047949812703802185
 MonoBehaviour:
   m_ObjectHideFlags: 0
