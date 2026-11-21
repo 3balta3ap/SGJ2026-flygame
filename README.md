@@ -1,5 +1,11 @@
 <div align="center">
 
+<img src="./_.png" />
+
+</div>
+
+<div align="center">
+
 [![Author](https://img.shields.io/badge/Author-BuzzStudio-00ff00)](https://github.com/3balta3ap)
 ![LastUpdated](https://img.shields.io/badge/Last_Updated-Nov_2026-0000ff)
 [![License](https://img.shields.io/badge/License-Apache_2.0-ff0000.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -73,7 +79,7 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 
 <div align="center">
 
-<img src="./Screenshot_2026-11-21_16-22-56.png" />
+<img src="./Bandeau-logo-SGJ-Japan-2026.png" />
 
 </div>
 
