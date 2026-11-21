@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Face buttons by position, so the same physical button works on every pad. East = the "action" button.
+    /// Face buttons by position, so the same physical button works on every pad. South = the "action" button.
     public enum FaceButton { East, South, North, West }
 
     /// Which button names to show on screen. Follows the device the player touched last.
     public enum PadLayout { Keyboard, Switch, Xbox, PlayStation }
 
     /// The only place that reads keyboard / gamepad. Gameplay code asks "what was pressed", never which device.
-    /// Action button = right face button (Switch A / Xbox B / PS ○) or Space / Enter.
+    /// Action button = bottom face button (Xbox A / PS × / Switch B) or Space / Enter.
     /// Pause = Start (Switch +) or Esc. Steering = left stick / D-pad / A-D / arrow keys.
     public static class InputCompat
     {
@@ -71,7 +71,7 @@ namespace FlyJam
             var k = Keyboard.current;
             var p = Gamepad.current;
             return (k != null && (k.spaceKey.wasPressedThisFrame || k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame))
-                || (p != null && p.buttonEast.wasPressedThisFrame);
+                || (p != null && p.buttonSouth.wasPressedThisFrame);
 #else
             return Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
 #endif
@@ -187,9 +187,9 @@ namespace FlyJam
             {
                 switch (Layout)
                 {
-                    case PadLayout.Switch: return "Ⓐ";
-                    case PadLayout.Xbox: return "Ⓑ";
-                    case PadLayout.PlayStation: return "○";
+                    case PadLayout.Switch: return "Ⓑ";
+                    case PadLayout.Xbox: return "Ⓐ";
+                    case PadLayout.PlayStation: return "×";
                     default: return "SPACE";
                 }
             }

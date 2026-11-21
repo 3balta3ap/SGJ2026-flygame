@@ -167,6 +167,8 @@ GameObject:
   - component: {fileID: 5369702876211011111}
   - component: {fileID: 1292903233601169717}
   - component: {fileID: 7662237562141047476}
+  - component: {fileID: 8105727145717067551}
+  - component: {fileID: 3639001680953828889}
   m_Layer: 0
   m_Name: Fly
   m_TagString: Untagged
@@ -218,7 +220,7 @@ MonoBehaviour:
   moveMode: 2
   isPlayer: 1
   balance: {fileID: 11400000, guid: 04ef71e149dbc466788d63cd8cd7204f, type: 2}
-  moveSpeed: 6
+  moveSpeed: 3.6
   backwardSpeedRatio: 0.5
   tankTurnSpeed: 150
   turnAnimSpeed: 1.5
@@ -254,6 +256,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.KeepClearZone
   radius: 3
+--- !u!114 &8105727145717067551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842822372463067481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d64813cf188c48628a17cc7b9141500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.VisualOffset
+  target: {fileID: 655032278519541173}
+--- !u!114 &3639001680953828889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842822372463067481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfcaaa8aa8eb04678b552f3a270bc4b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Village::FlyJam.PondSink
+  sinkDepth: 0.15
+  sinkSeconds: 0.15
+  edgeMargin: 0.1
+  rippleMaterial: {fileID: 2100000, guid: 77f5832477fb448caaee4356fd2c7a34, type: 2}
+  rippleInterval: 0.5
+  rippleSeconds: 0.9
+  rippleStartRadius: 0.25
+  rippleEndRadius: 0.9
+  rippleWidth: 0.035
+  rippleColor: {r: 0.85, g: 0.95, b: 1, a: 0.35}
+  rippleSegments: 18
 --- !u!1 &1912950121087627483
 GameObject:
   m_ObjectHideFlags: 0

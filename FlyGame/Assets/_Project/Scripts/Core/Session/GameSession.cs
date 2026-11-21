@@ -16,13 +16,20 @@ namespace FlyJam
         [SerializeField] float dayLength = 45f;
         [Tooltip("Used only when 'balance' is empty")]
         [SerializeField] float resultDelay = 2.0f;
+        [Tooltip("Used only when 'balance' is empty")]
+        [SerializeField] float nightStart = 0.778f;
 
         readonly HashSet<object> pausers = new HashSet<object>();
 
         public float Elapsed { get; private set; }
         public float DayLength => balance != null ? balance.DayLength : Mathf.Max(5f, dayLength);
         public float ResultDelay => balance != null ? balance.ResultDelay : resultDelay;
+        public float NightStart => balance != null ? balance.NightStart : nightStart;
         public float Remaining => Mathf.Max(0f, DayLength - Elapsed);
+        /// 0 on the first day, 1 on the second ...
+        public int DayIndex => Mathf.FloorToInt(Elapsed / DayLength);
+        /// True from NightStart to the end of each day.
+        public bool IsNight => DayProgress >= NightStart;
         /// 0 -> 1 over the first day, then stays 1.
         public float Normalized => Mathf.Clamp01(Elapsed / DayLength);
         /// 0 -> 1 every day, repeating (sky colour).
@@ -47,10 +54,18 @@ namespace FlyJam
             GameEvents.RaiseRoundStarted();
         }
 
+        bool wasNight;
+
         void Update()
         {
             if (Ended || IsPaused) return;
             Elapsed += Time.deltaTime;
+            bool night = IsNight;
+            if (night != wasNight)
+            {
+                wasNight = night;
+                GameEvents.RaiseNightChanged(night, DayIndex);
+            }
         }
 
         public void Pause(object by)

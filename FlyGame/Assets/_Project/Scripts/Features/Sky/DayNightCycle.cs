@@ -24,6 +24,9 @@ namespace FlyJam
         [SerializeField] float arcLowElevation = -36f;
         [SerializeField] float arcPeakElevation = -14f;
 
+        /// Night start (0-1 of the day): from GameSession (sheet "Session".nightStart) when present, else this inspector value.
+        float NightStart => session != null ? session.NightStart : nightStart;
+
         public float T { get; private set; }
         public float NightFactor { get; private set; }
 
@@ -58,13 +61,13 @@ namespace FlyJam
             if (worldCamera == null || planet == null) return;
 
             T = session != null ? session.DayProgress : Mathf.Repeat(Time.time / idleCycleSeconds, 1f);
-            NightFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(nightStart - 0.08f, nightStart + 0.04f, T));
+            NightFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(NightStart - 0.08f, NightStart + 0.04f, T));
 
             Vector3 up = planet.UpAt(worldCamera.transform.position);
             Vector3 fwd = Vector3.ProjectOnPlane(worldCamera.transform.forward, up).normalized;
 
-            Vector3 sunDir = Arc(up, fwd, Mathf.InverseLerp(0f, nightStart, T));
-            Vector3 moonDir = Arc(up, fwd, Mathf.InverseLerp(nightStart - 0.05f, 1f, T) * 0.7f);
+            Vector3 sunDir = Arc(up, fwd, Mathf.InverseLerp(0f, NightStart, T));
+            Vector3 moonDir = Arc(up, fwd, Mathf.InverseLerp(NightStart - 0.05f, 1f, T) * 0.7f);
 
             Color horizon = horizonColor.Evaluate(T);
             skyInstance.SetVector("_SkyUp", up);
@@ -93,7 +96,7 @@ namespace FlyJam
 
         void BuildDefaults()
         {
-            float[] t = { 0f, 5f / 45f, 25f / 45f, 30f / 45f, nightStart, 1f };
+            float[] t = { 0f, 5f / 45f, 25f / 45f, 30f / 45f, NightStart, 1f };
             topColor = G(t, new[] { C(0.30f, 0.32f, 0.58f), C(0.35f, 0.60f, 0.95f), C(0.35f, 0.60f, 0.95f), C(0.45f, 0.38f, 0.70f), C(0.07f, 0.08f, 0.22f), C(0.03f, 0.04f, 0.12f) });
             horizonColor = G(t, new[] { C(1.00f, 0.62f, 0.48f), C(0.75f, 0.88f, 1.00f), C(0.75f, 0.88f, 1.00f), C(1.00f, 0.55f, 0.30f), C(0.25f, 0.16f, 0.32f), C(0.07f, 0.08f, 0.20f) });
             lightColor = G(t, new[] { C(1.00f, 0.72f, 0.55f), C(1.00f, 0.97f, 0.90f), C(1.00f, 0.97f, 0.90f), C(1.00f, 0.62f, 0.38f), C(0.60f, 0.68f, 1.00f), C(0.60f, 0.68f, 1.00f) });

@@ -3,7 +3,8 @@ using UnityEngine;
 namespace FlyJam
 {
     /// Female movement (C03): roams the planet (walk / short rest); runs away while the player is within fleeRadius,
-    /// goes back to roaming beyond releaseRadius. Speed = player max speed x speedRatio.
+    /// goes back to roaming beyond releaseRadius. Speed = MateBalance.speed (absolute).
+    /// Shy below MateBalance.shyUntilLevel (Level feature): bigger flee range, no pull toward the player.
     /// Freeze() during courtship; Flee() after a failed courtship.
     public class MateAI : MonoBehaviour, IMoveInput
     {
@@ -23,6 +24,8 @@ namespace FlyJam
         [SerializeField] Transform player;
         [SerializeField] MateBalance balance;
         [SerializeField] float leashJitter = 30f;
+        [Tooltip("Speech bubble when she stops being shy (the player reached shyUntilLevel). Empty = none")]
+        [SerializeField] string notShyBubbleKey = "bubble.mate.near";
 
         enum Mode { Pause, Walk, Flee, Frozen }
         Mode mode = Mode.Pause;
@@ -31,6 +34,9 @@ namespace FlyJam
         SphereWalker playerWalker;
 
         public bool IsFleeing => mode == Mode.Flee;
+        /// Shy = keeps far away. Only with the Level feature on (PlayerProgress.Active).
+        public bool IsShy => balance != null && PlayerProgress.Active && PlayerProgress.Level < balance.ShyUntilLevel;
+        bool wasShy;
 
         void Awake()
         {
@@ -45,6 +51,7 @@ namespace FlyJam
 
         void Start()
         {
+            wasShy = IsShy;
             heading = transform.forward;
             timer = Random.Range(PauseMin, PauseMax);
         }
@@ -60,8 +67,11 @@ namespace FlyJam
 
             if (forcedFlee > 0f) forcedFlee -= Time.deltaTime;
             float dist = Vector3.Distance(transform.position, player.position);
-            float fleeR = balance != null ? balance.FleeRadius : 5f;
-            float releaseR = balance != null ? balance.ReleaseRadius : 8f;
+            bool shy = IsShy;
+            if (wasShy && !shy && !string.IsNullOrEmpty(notShyBubbleKey)) GameEvents.RaiseBubbleRequested(notShyBubbleKey, 3);
+            wasShy = shy;
+            float fleeR = balance == null ? 5f : shy ? balance.ShyFleeRadius : balance.FleeRadius;
+            float releaseR = balance == null ? 8f : shy ? balance.ShyReleaseRadius : balance.ReleaseRadius;
             bool flee = forcedFlee > 0f || (mode == Mode.Flee ? dist < releaseR : dist <= fleeR);
 
             if (flee)
@@ -87,7 +97,7 @@ namespace FlyJam
                 Vector3 playerUp = self.Planet.UpAt(player.position);
                 Vector3 baseDir;
                 float jitter;
-                if (Vector3.Angle(up, playerUp) > (balance != null ? balance.LeashAngle : 100f))
+                if (!IsShy && Vector3.Angle(up, playerUp) > (balance != null ? balance.LeashAngle : 100f))
                 {
                     baseDir = Vector3.ProjectOnPlane(player.position - transform.position, up);
                     jitter = leashJitter;
@@ -114,9 +124,8 @@ namespace FlyJam
 
         void ApplySpeed()
         {
-            float playerMax = playerWalker != null ? playerWalker.MoveSpeed : 6f;
-            float ratio = balance != null ? balance.SpeedRatio : 0.5f;
-            self.SpeedMultiplier = playerMax * ratio / Mathf.Max(0.01f, self.MoveSpeed);
+            float speed = balance != null ? balance.Speed : 4.4f;
+            self.SpeedMultiplier = speed / Mathf.Max(0.01f, self.MoveSpeed);
         }
 
         public Vector2 ReadMove()

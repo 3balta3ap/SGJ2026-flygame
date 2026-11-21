@@ -28,6 +28,7 @@ namespace FlyJam
         {
             if (player == null) return;
             if (session != null && (session.Ended || session.IsPaused)) return;
+            if (PlayerProgress.Fever) return;   // flying during the level-up fever: courtship starts after landing
 
             float d = Vector3.Distance(player.position, transform.position);
             if (waitForSeparation)

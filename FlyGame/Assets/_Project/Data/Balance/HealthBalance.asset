@@ -16,7 +16,8 @@ MonoBehaviour:
   startHp: 5
   drainPerSecond: 0.1
   obstacleDamageRatio: 0.2
-  minSpeedRatio: 0.3
+  speedAtZeroHp: 0.85
   invulnerableTime: 1.5
   blinkInterval: 0.08
-  lowHpRatio: 0.3
+  midHpRatio: 0.5
+  lowHpRatio: 0.2

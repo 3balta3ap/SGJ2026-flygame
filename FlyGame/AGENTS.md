@@ -22,32 +22,37 @@
 - 입력은 `Core/Session/InputCompat`만 읽는다(패드 우선, 키보드 대체, 기기별 버튼 표기).
 
 ### 2.2 어셈블리(`.asmdef`) 및 의존 방향
-`Assets/_Project/Scripts/` 아래 13개 어셈블리(런타임 12 + 에디터 전용 `Editor/FlyJam.Editor.asmdef`: 참조 `FlyJam.Core`)로 분리되어 컴파일 단계에서 의존 방향을 강제한다.
+`Assets/_Project/Scripts/` 아래 16개 어셈블리(런타임 15 + 에디터 전용 `Editor/FlyJam.Editor.asmdef`: 참조 `FlyJam.Core`)로 분리되어 컴파일 단계에서 의존 방향을 강제한다.
 
 - **Core**: `Core/FlyJam.Core.asmdef` → 참조: `Unity.InputSystem`, `UnityEngine.UI`
   - 하위 폴더: `Events/`, `Session/`, `World/`, `World/Obstacles/`, `Player/`, `Camera/`, `Render/`
   - **코어는 기능을 모른다.**
-- **Features** (10개): `Features/{Courtship, Dodge, Fx, Hazards, Health, Items, Mate, Rival, Sky, Village}/FlyJam.<Name>.asmdef`
-  - 기본 참조: `FlyJam.Core` (`Hazards`·`Rival`은 `+ Unity.TextMeshPro`, `Courtship`·`Health`는 `+ Unity.TextMeshPro, UnityEngine.UI`, `Mate`는 `+ UnityEngine.UI`)
+- **Features** (13개): `Features/{Audio, Bubble, Courtship, Dodge, Fx, Hazards, Health, Items, Level, Mate, Rival, Sky, Village}/FlyJam.<Name>.asmdef`
+  - 기본 참조: `FlyJam.Core` (`Hazards`·`Rival`은 `+ Unity.TextMeshPro`, `Courtship`·`Health`·`Level`·`Bubble`은 `+ Unity.TextMeshPro, UnityEngine.UI`, `Mate`는 `+ UnityEngine.UI`, `Audio`는 `+ Unity.InputSystem`)
   - **기능끼리 서로를 모른다.** 유일한 예외: `FlyJam.Courtship` → `FlyJam.Mate`
 - **UI**: `UI/FlyJam.UI.asmdef` → 참조: `FlyJam.Core`, `Unity.TextMeshPro`
 
 **고정된 코어 계약** (임의 변경 금지): `FlyState`, `IMoveInput`, `IObstacle`/`IMovingObstacle`, `GameEvents` 코어 파일, `SessionResult` 키-값 API, 알파 채널 층 규칙(하늘 `0` / 땅 `0.5` / 물체 `1.0`, 안개 `-0.2`), 셰이더 전역 변수(`_Fly*`).
 
-### 2.3 `Game.unity` 계층 & `SYS_*` 프리팹 (12개)
-`Game.unity`는 `[Core]` + 12개 기능 프리팹(`Assets/_Project/Prefabs/SYS_*.prefab`)으로 구성된다. 루트 `GameSession`은 `SessionBalance`(하루 길이, 결과 대기)를 참조한다.
+**레벨 정보 공유**: 레벨이 정하는 값은 Core의 `PlayerProgress`(`LevelInfo` 한 줄 + `Fever`)로만 읽는다. 쓰는 곳은 Level 기능 하나. 모델 높이는 `VisualOffset.Set(키, 값)`(키: `fever`, `pond`)으로만 바꾼다.
+
+### 2.3 `Game.unity` 계층 & `SYS_*` 프리팹 (15개)
+`Game.unity`는 `[Core]` + 15개 기능 프리팹(`Assets/_Project/Prefabs/SYS_*.prefab`)으로 구성된다. 루트 `GameSession`은 `SessionBalance`(하루 길이, 결과 대기)를 참조한다.
 
 - **`[Core]`** (씬 직접 배치): `GameContext` (`ExecutionOrder -1000`), `GameSession`, `Planet`, `Fly` (`Fly.prefab`), `Main Camera` (`PlanetFollowCamera`, 자식 `Directional Light`), `ScreenCamera`, `PixelCanvas` (`sortingOrder -100`), `PixelRenderer` (`PixelRenderer`, `PixelPalette`, `ToonLighting`), `Toonify` (`ToonMaterialSwapper`: `Planet(0.5)`, `Fly(1)`).
-- **`SYS_Village.prefab`**: `Village` (`VillageGenerator`, `Generated`는 비어 있음, `keepClear` 비움, `Fruit` 항목은 count 0(먹는 사과와 구분)), `Pond` (`SurfacePlacer`, `SurfaceDisc`, `PlanetProp`, `ToonifyOnSpawn`), `BigTree` (`tree_oak.fbx` 중첩).
+- **`SYS_Village.prefab`**: `Village` (`VillageGenerator`, `Generated`는 비어 있음, `Fruit` count 0, `Thorn` 없음, landmarks = Pond·BigTree·Pond2), `Pond`·`Pond2` (`SurfacePlacer`, `SurfaceDisc`, `PlanetProp`(Decor = 들어갈 수 있음), `WaterZone`, `ToonifyOnSpawn`), `BigTree`.
 - **`SYS_Sky.prefab`**: `DayNight` (`DayNightCycle`, 하늘색 = `GameSession.DayProgress`, 하루 반복. 라운드를 끝내지 않음).
 - **`SYS_Health.prefab`**: `PlayerHealth`(`HealthBalance`, HP → 속도), 자체 `Canvas`(`sortingOrder 1`: `HealthBar` = 막대·숫자·증감·저체력 문구).
-- **`SYS_Items.prefab`**: `AppleSpawner`(`ItemBalance`, `Apple.prefab`, 고정 지점 `Points/P0~P7`).
+- **`SYS_Items.prefab`**: `AppleSpawner`(`ItemBalance` + 시트 `ItemTypes`, `Apple.prefab`·`Banana.prefab`, 고정 지점 `Points/P0~P7` 각각 `KeepClearZone`).
+- **`SYS_Level.prefab`**: `PlayerLevel`(`LevelBalance` + 시트 `LevelTable`: 레벨별 속도·회전·최대 체력·바나나 확률·구애 난이도, 레벨업 피버), 자체 `Canvas`(`sortingOrder 2`: `FeverVignette`, `ExpBar`, `LevelUpPopup`).
+- **`SYS_Bubble.prefab`**: `SpeechBubble`(주인공 머리 위 픽셀 말풍선, `BubbleRequested` 큐), `BubbleTriggers`(밤 대사), 자체 `Canvas`(`sortingOrder 9`).
+- **`SYS_Audio.prefab`**: `AudioDirector`(음악·효과음 슬롯, DontDestroyOnLoad, Title·Game 두 씬에 배치), `RumbleDirector`(패드 진동).
 - **`SYS_Hazards.prefab`**: `ObstacleSpawner`(`HazardBalance`, 종류별 고정 개체 수 `dragonfly/spider/male/acorn`, 행성을 계속 돎), `NearMissDirector`(경고 대상·테두리·안내·슬로·회피 성공), `ReactionTracker`, 자체 `Canvas`(`sortingOrder 10`: `WarningFrame`, `PerfectText`, `PromptRoot`). 적 = `RollingObstacle` 범용 컴포넌트, 종류별 숫자는 시트 `HazardTypes`.
 - **`SYS_Dodge.prefab`**: `DodgeAbility`(`DodgeBalance`, 경고 중에만, `ExecutionOrder -10`).
 - **`SYS_Mate.prefab`**: 중첩 `Mate.prefab`(`MateAI`+`MateBalance`, `MateGoal`, `MotionBlindVisibility`(motionBlind 끔) …), 자체 `Canvas`(`sortingOrder 11`: `MateHint` + `MateFinderHint` = 머리 위 발견 마크).
 - **`SYS_Courtship.prefab`**: `CourtshipFlow`, `CourtshipQTE`(`CourtshipBalance`, 버튼 순서 입력), 자체 `Canvas`(`sortingOrder 12`: `CourtshipPanel`).
 - **`SYS_Rival.prefab`**: `RivalBattle`(`RivalBalance`, 수컷 접촉 시 연타 배틀), 자체 `Canvas`(`sortingOrder 13`: `RivalPanel`).
-- **`SYS_Fx.prefab`**: `FxDirector`(+ 사과 먹기), `AmbientParticles`, 파티클 7종.
+- **`SYS_Fx.prefab`**: `FxDirector`(+ 아이템 먹기), `AmbientParticles`, `DashRingFx`(대시 링), `WindGusts`(바람 줄기), 파티클 6종.
 - **`SYS_Menu.prefab`**: `PauseMenu`, `ResultPanel`, `EventSystem`, 자체 `Canvas`(`sortingOrder 20`: `PausePanel`·`ResultPanel`, 각각 `MenuNavigator`).
 - **`SYS_UI.prefab`**: HUD `Canvas`(`sortingOrder 0`), `GameHud`(아래 가운데 이동 안내 `Guide`).
 
@@ -68,7 +73,7 @@
 | **v7 (Phase 16)** | `BackpedalFacing`으로 뒷걸음 시 `Fly/Visual`만 180° 회전(`backwardSpeedRatio = 0.7`)해 카메라 회전 없이 얼굴 노출. |
 | **v8 (Phase 17 A~G)** | 죽은 코드 삭제, `GameEvents` partial 5파일 분리, `GameContext`·`ToonLighting`·`KeepClearZone`·`IMovingObstacle` 도입, `GameSession` 슬림화 + `CourtshipFlow`·`DodgeAbility` 분리, `SessionResult` 키-값화, 폴더 재배치 + `.asmdef` 10개, `SYS_*` 프리팹 9개 분리(제거 테스트 통과). |
 | **후속 / v9 작업** | 프로젝트 50개 파일 한글 주석/헤더/툴팁/로그 전체 영문 변환, `ThirdParty/Silver/Silver.ttf`로 `Assets/_Project/Art/Fonts/Silver SDF.asset` 생성(`Dynamic`, `SDFAA`, `1024×1024`), `TMP Settings` 기본 폰트 교체, `Title`·`Result`·`SYS_UI`·`SYS_Hazards`·`SYS_Courtship` 전체 TMP 텍스트 `Silver SDF` 적용(크기 유지, `Bold` 해제), `Title` 우하단 크레딧(`Font: Silver by Poppy Works (CC BY 4.0)`) 추가. |
-| **CHI/01~05 (dev)** | 01 Balance Sync(구글 시트 → `BalanceTable`), 02 EN/JA(`Loc`, `TextTable`), 03 체력, 04 적 3종, 05 기획서 M1~M4 전체(오토런, 패드, 사과, 고정 개체 적, 경고·회피, 연타 배틀, 버튼 순서 구애, 일시정지, 결과 패널. Backpedal·Result 씬 삭제). |
+| **CHI/01~06 (dev)** | 01 Balance Sync(구글 시트 → `BalanceTable`), 02 EN/JA(`Loc`, `TextTable`), 03 체력, 04 적 3종, 05 기획서 M1~M4 전체(오토런, 패드, 사과, 고정 개체 적, 경고·회피, 연타 배틀, 버튼 순서 구애, 일시정지, 결과 패널. Backpedal·Result 씬 삭제). 06 레벨(EXP·속도·회전·최대 체력 성장, 피버), 앞 대시, 수컷 회피 정지·낮밤 강화, 바나나, 체력 막대 개편, 말풍선, 연못 2곳·잠김, 가시 삭제, 바람·대시 링, 사운드·진동, 타이틀 이미지 칸. |
 
 ---
 

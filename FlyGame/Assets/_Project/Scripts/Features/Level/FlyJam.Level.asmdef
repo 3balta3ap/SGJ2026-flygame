@@ -1,0 +1,10 @@
+{
+    "name": "FlyJam.Level",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "autoReferenced": true
+}

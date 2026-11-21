@@ -12,10 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c2c04641d3ad4d2eae93bf8d9a269d9, type: 3}
   m_Name: ItemBalance
   m_EditorClassIdentifier: FlyJam.Items::FlyJam.ItemBalance
-  healRatio: 0.2
   respawnDistance: 20
   pickupRadius: 1
-  hoverHeight: 0.6
-  bobHeight: 0.12
-  bobSpeed: 2.5
+  hoverHeight: 0.75
+  bobHeight: 0.35
+  bobSpeed: 4.5
   spinSpeed: 90
+  rareChance: 0.1
+  types:
+  - id: apple
+    rare: 0
+    healRatio: 0.2
+    exp: 1
+  - id: banana
+    rare: 1
+    healRatio: 0.4
+    exp: 3

@@ -47,6 +47,8 @@ namespace FlyJam
             if (statsText != null)
             {
                 var sb = new StringBuilder();
+                if (SessionResult.TryGetStat("level", out float level) && level > 0f)
+                    sb.AppendLine(Loc.Format("result.level", level));
                 if (SessionResult.TryGetStat("reaction.best", out float best))
                 {
                     sb.AppendLine(Loc.Format("result.best", best));

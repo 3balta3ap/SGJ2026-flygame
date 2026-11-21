@@ -1,0 +1,9 @@
+{
+    "name": "FlyJam.Audio",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core",
+        "Unity.InputSystem"
+    ],
+    "autoReferenced": true
+}

@@ -20,7 +20,11 @@ namespace FlyJam
         [SerializeField] HazardBalance balance;
         [SerializeField] TypePrefab[] prefabs;
 
+        [Tooltip("Speech bubble text key shown when a rival (male) appears for the first time. Empty = none")]
+        [SerializeField] string rivalBubbleKey = "bubble.male";
+
         float timer;
+        bool rivalAnnounced;
 
         void Start()
         {
@@ -31,7 +35,7 @@ namespace FlyJam
                 if (player == null) player = ctx.Player;
                 if (session == null) session = ctx.Session;
             }
-            timer = balance != null ? balance.FirstDelay : 2f;
+            timer = 0f;
 
             if (balance != null)
                 foreach (var t in balance.Types)
@@ -45,12 +49,15 @@ namespace FlyJam
             if (session.Ended || session.IsPaused) return;
             timer -= Time.deltaTime;
             if (timer > 0f) return;
-            timer = balance.SpawnInterval;
 
-            if (PickShortType(out var row, out var prefab)) Spawn(row, prefab);
+            if (PickShortType(out var row, out var prefab))
+            {
+                Spawn(row, prefab);
+                timer = balance.SpawnInterval;
+            }
         }
 
-        /// The type with the biggest shortage (count - alive). False when every type is full.
+        /// Among types whose firstDelay has passed: the one with the biggest shortage (count - alive). False when none.
         bool PickShortType(out HazardBalance.TypeRow row, out RollingObstacle prefab)
         {
             row = default;
@@ -59,7 +66,7 @@ namespace FlyJam
             foreach (var t in balance.Types)
             {
                 var p = FindPrefab(t.id);
-                if (p == null || t.count <= 0) continue;
+                if (p == null || t.count <= 0 || session.Elapsed < t.firstDelay) continue;
                 int shortage = t.count - AliveOf(t.id);
                 if (shortage > best)
                 {
@@ -94,7 +101,13 @@ namespace FlyJam
             Vector3 heading = Quaternion.AngleAxis(Random.Range(0f, 360f), sUp) * anyTangent;
 
             var o = Instantiate(prefab);
-            o.Launch(planet, spawnPos, heading, player.MoveSpeed * row.speedRatio, 0f, row, player.transform);
+            o.Launch(planet, spawnPos, heading, Mathf.Max(0.1f, row.speed), 0f, row, player.transform);
+            GameEvents.RaiseEnemyAppeared(row.id);
+            if (row.rival && !rivalAnnounced && !string.IsNullOrEmpty(rivalBubbleKey))
+            {
+                rivalAnnounced = true;
+                GameEvents.RaiseBubbleRequested(rivalBubbleKey, 2);
+            }
         }
 
         RollingObstacle FindPrefab(string id)

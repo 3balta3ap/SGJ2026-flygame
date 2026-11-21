@@ -220,6 +220,7 @@ MonoBehaviour:
   player: {fileID: 0}
   balance: {fileID: 11400000, guid: c405d5cb97338476cacee6bf7bb22b31, type: 2}
   leashJitter: 30
+  notShyBubbleKey: bubble.mate.near
 --- !u!114 &2249260042588705232
 MonoBehaviour:
   m_ObjectHideFlags: 0

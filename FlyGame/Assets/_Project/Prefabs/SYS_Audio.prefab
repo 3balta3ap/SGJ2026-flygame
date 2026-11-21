@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4285309736719128208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7221379438266408731}
+  - component: {fileID: 6267071300694576765}
+  - component: {fileID: 2046918583748779018}
+  m_Layer: 0
+  m_Name: SYS_Audio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7221379438266408731
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4285309736719128208}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6267071300694576765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4285309736719128208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4777669076144a9cbef74a0c37e1b3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Audio::FlyJam.AudioDirector
+  music: {fileID: 8300000, guid: 207b02e852ba3447986c79ae26704401, type: 3}
+  musicVolume: 0.6
+  pauseDuck: 0.5
+  musicFadeSeconds: 1
+  victory: {fileID: 8300000, guid: c5c68acdd35144248ad6b33519378f99, type: 3}
+  victoryVolume: 0.8
+  sfxVolume: 1
+  itemEaten:
+    clip: {fileID: 8300000, guid: a6dd200daea6a4030b3842e190fdd619, type: 3}
+    volume: 1
+  damage:
+    clip: {fileID: 8300000, guid: 0781da23ce93e4f96a30d6e7822928e2, type: 3}
+    volume: 1
+  dodgeSuccess:
+    clip: {fileID: 8300000, guid: bed2bbd921f9b4f13adadf9456b1da24, type: 3}
+    volume: 1
+  dash:
+    clip: {fileID: 8300000, guid: bed2bbd921f9b4f13adadf9456b1da24, type: 3}
+    volume: 1
+  warning:
+    clip: {fileID: 0}
+    volume: 1
+  courtshipCorrect:
+    clip: {fileID: 8300000, guid: 7cfe6ede11ae644c0a86875af77eac22, type: 3}
+    volume: 1
+  courtshipWrong:
+    clip: {fileID: 8300000, guid: 0781da23ce93e4f96a30d6e7822928e2, type: 3}
+    volume: 1
+  rivalPress:
+    clip: {fileID: 8300000, guid: bed2bbd921f9b4f13adadf9456b1da24, type: 3}
+    volume: 1
+  rivalWin:
+    clip: {fileID: 8300000, guid: 7cfe6ede11ae644c0a86875af77eac22, type: 3}
+    volume: 1
+  menuMove:
+    clip: {fileID: 8300000, guid: a6dd200daea6a4030b3842e190fdd619, type: 3}
+    volume: 1
+  menuSelect:
+    clip: {fileID: 8300000, guid: a6dd200daea6a4030b3842e190fdd619, type: 3}
+    volume: 1
+  pauseOpen:
+    clip: {fileID: 8300000, guid: a6dd200daea6a4030b3842e190fdd619, type: 3}
+    volume: 1
+  levelUp:
+    clip: {fileID: 0}
+    volume: 1
+  fever:
+    clip: {fileID: 8300000, guid: 7cfe6ede11ae644c0a86875af77eac22, type: 3}
+    volume: 1
+  bubble:
+    clip: {fileID: 8300000, guid: bed2bbd921f9b4f13adadf9456b1da24, type: 3}
+    volume: 1
+  gameOver:
+    clip: {fileID: 0}
+    volume: 1
+--- !u!114 &2046918583748779018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4285309736719128208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c11a4e5d7d0467888c9b8b6ed264c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Audio::FlyJam.RumbleDirector
+  rumbleOn: 1
+  hit: {x: 0.25, y: 0.5, z: 0.15}
+  levelUp: {x: 0.4, y: 0.8, z: 0.35}

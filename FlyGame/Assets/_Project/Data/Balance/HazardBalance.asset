@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98f53c26fcd234682bc62f306d87abf7, type: 3}
   m_Name: HazardBalance
   m_EditorClassIdentifier: FlyJam.Hazards::FlyJam.HazardBalance
-  firstDelay: 2
   spawnInterval: 1.5
   spawnAngleMin: 50
   spawnAngleMax: 170
@@ -23,7 +22,8 @@ MonoBehaviour:
   types:
   - id: dragonfly
     count: 2
-    speedRatio: 0.7
+    firstDelay: 2
+    speed: 3.4
     damageRatio: 0.2
     warn: 1
     rival: 0
@@ -32,9 +32,16 @@ MonoBehaviour:
     loseRadius: 0
     turnRate: 0
     stopOnHit: 2
+    stopOnDodge: 0
+    chaseCooldown: 0
+    daySpeedUp: 0
+    nightSpeedUp: 0
+    dayCooldownCut: 0
+    nightCooldownCut: 0
   - id: spider
     count: 2
-    speedRatio: 0.7
+    firstDelay: 2
+    speed: 3.4
     damageRatio: 0.2
     warn: 1
     rival: 0
@@ -43,9 +50,16 @@ MonoBehaviour:
     loseRadius: 0
     turnRate: 0
     stopOnHit: 2
+    stopOnDodge: 0
+    chaseCooldown: 0
+    daySpeedUp: 0
+    nightSpeedUp: 0
+    dayCooldownCut: 0
+    nightCooldownCut: 0
   - id: male
     count: 1
-    speedRatio: 0.7
+    firstDelay: 20
+    speed: 3.8
     damageRatio: 0
     warn: 1
     rival: 1
@@ -54,9 +68,16 @@ MonoBehaviour:
     loseRadius: 9
     turnRate: 120
     stopOnHit: 2
+    stopOnDodge: 1
+    chaseCooldown: 3
+    daySpeedUp: 0.1
+    nightSpeedUp: 0.25
+    dayCooldownCut: 0.2
+    nightCooldownCut: 0.5
   - id: acorn
     count: 1
-    speedRatio: 0.7
+    firstDelay: 2
+    speed: 3.2
     damageRatio: 0.1
     warn: 1
     rival: 0
@@ -65,3 +86,9 @@ MonoBehaviour:
     loseRadius: 0
     turnRate: 0
     stopOnHit: 0
+    stopOnDodge: 0
+    chaseCooldown: 0
+    daySpeedUp: 0
+    nightSpeedUp: 0
+    dayCooldownCut: 0
+    nightCooldownCut: 0
