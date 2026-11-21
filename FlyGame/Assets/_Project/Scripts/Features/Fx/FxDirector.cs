@@ -8,7 +8,7 @@ namespace FlyJam
         [SerializeField] Planet planet;
         [SerializeField] Transform player;
         [SerializeField] ParticleSystem dodgeTrail, hitBurst, heartBurst, matePop, perfectBurst;
-        [Tooltip("Apple pickup burst. Empty = uses perfectBurst")]
+        [Tooltip("Item pickup burst (apple, banana). Empty = uses perfectBurst")]
         [SerializeField] ParticleSystem appleBurst;
 
         void Awake()
@@ -33,7 +33,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished += OnCourtship;
             GameEvents.MateAppeared += OnMateAppeared;
             GameEvents.PerfectDodge += OnPerfect;
-            GameEvents.AppleEaten += OnApple;
+            GameEvents.ItemEaten += OnItem;
         }
 
         void OnDisable()
@@ -43,7 +43,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished -= OnCourtship;
             GameEvents.MateAppeared -= OnMateAppeared;
             GameEvents.PerfectDodge -= OnPerfect;
-            GameEvents.AppleEaten -= OnApple;
+            GameEvents.ItemEaten -= OnItem;
         }
 
         void OnDodged(Vector3 pos, Vector3 dir)
@@ -63,7 +63,7 @@ namespace FlyJam
 
         void OnPerfect() => PlayUp(perfectBurst, player.position, 0.4f);
 
-        void OnApple(Vector3 pos) => PlayUp(appleBurst != null ? appleBurst : perfectBurst, pos, 0.4f);
+        void OnItem(string id, Vector3 pos) => PlayUp(appleBurst != null ? appleBurst : perfectBurst, pos, 0.4f);
 
         void PlayUp(ParticleSystem ps, Vector3 pos, float lift)
         {

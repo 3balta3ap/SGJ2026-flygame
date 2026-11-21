@@ -6,7 +6,8 @@ namespace FlyJam
     /// Danger warning and dodge result (E01, E02, A04).
     /// Warning = the nearest enemy that is heading at the player within warnRadius. While warned:
     /// red frame on the screen edges, "Ⓐボタンで回避！" prompt, slow motion, and dodging is allowed (DodgeAbility listens to WarningChanged).
-    /// Success = after a dodge, that enemy leaves the danger range without touching the player -> "回避!" once.
+    /// Success = after a dash, that enemy leaves the danger range (or freezes: stopOnDodge) without touching the player -> "回避!" once.
+    /// No warning during the level-up fever (the player is invulnerable then).
     /// (Class name kept from the prototype so the SYS_Hazards prefab link survives.)
     public class NearMissDirector : MonoBehaviour
     {
@@ -59,7 +60,7 @@ namespace FlyJam
         void Update()
         {
             bool live = player != null && session != null && balance != null && !session.Ended && !session.IsPaused
-                        && player.InputEnabled && player.State != FlyState.Disabled;
+                        && player.InputEnabled && player.State != FlyState.Disabled && !PlayerProgress.Fever;
 
             var next = live ? FindThreat() : null;
             if (next != target) SetTarget(next);
@@ -116,6 +117,7 @@ namespace FlyJam
             if (target == null) return;
             dodged = target;
             dodgedTimer = balance != null ? balance.SuccessTimeout : 3f;
+            if (dodged.OnDodged()) Succeed();   // stopOnDodge (male): it freezes, so the dodge counts right away
         }
 
         void OnHitBy(IObstacle src)
@@ -127,15 +129,21 @@ namespace FlyJam
         {
             if (dodged == null) return;
             dodgedTimer -= Time.deltaTime;
-            if (!InDanger(dodged))
-            {
-                dodged = null;
-                PerfectCount++;
-                perfectUntil = Time.unscaledTime + successShowSeconds;
-                GameEvents.RaiseDodgeSucceeded();
-                GameEvents.RaisePerfectDodge();   // existing FX burst
-            }
+            // Passed (not heading at the player any more) AND clear of its body: a forward dash can go through an enemy,
+            // so "behind but still overlapping" must not count yet (E02: never success + hit for the same dash).
+            float clear = dodged.HitRadius + 0.6f;
+            bool apart = Vector3.Distance(player.transform.position, dodged.Position) > clear;
+            if (!InDanger(dodged) && apart) Succeed();
             else if (dodgedTimer <= 0f) dodged = null;
+        }
+
+        void Succeed()
+        {
+            dodged = null;
+            PerfectCount++;
+            perfectUntil = Time.unscaledTime + successShowSeconds;
+            GameEvents.RaiseDodgeSucceeded();
+            GameEvents.RaisePerfectDodge();   // existing FX burst
         }
 
         void OnRoundEnded(bool cleared) => SessionResult.SetStat(PerfectKey, PerfectCount);

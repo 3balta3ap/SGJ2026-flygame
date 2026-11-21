@@ -2,10 +2,14 @@ using UnityEngine;
 
 namespace FlyJam
 {
+    /// Follows behind the player. Pulls back to a wide view when the player stops, or (auto-run) when the stick
+    /// has been neutral for CameraBalance.idleSeconds. Comes back as soon as the player steers, warns or an event starts.
     [RequireComponent(typeof(Camera))]
     public class PlanetFollowCamera : MonoBehaviour
     {
         [SerializeField] SphereWalker target;
+        [Tooltip("Sheet tab 'Camera'. Empty = the look-out values below, idle wide view after 1 s")]
+        [SerializeField] CameraBalance balance;
         [SerializeField] float fieldOfView = 40f;
         [SerializeField] float distance = 6.75f;
         [SerializeField] float height = 3.3f;
@@ -26,8 +30,14 @@ namespace FlyJam
         Vector3 heading;
         bool initialized;
         float zoom;
+        float neutralTime;
+        bool warned;
 
         void Awake() => cam = GetComponent<Camera>();
+
+        void OnEnable() => GameEvents.WarningChanged += OnWarning;
+        void OnDisable() => GameEvents.WarningChanged -= OnWarning;
+        void OnWarning(IMovingObstacle t) => warned = t != null;
 
         void LateUpdate()
         {
@@ -50,10 +60,21 @@ namespace FlyJam
                 heading = Vector3.Slerp(heading, tf, 1f - Mathf.Exp(-headingFollow * Time.deltaTime)).normalized;
             }
 
-            bool lookOut = !SuppressLookOut && target.State == FlyState.Stopped && target.TimeInState > lookOutDelay;
-            zoom = Mathf.Lerp(zoom, lookOut ? 1f : 0f, 1f - Mathf.Exp(-zoomSharpness * Time.deltaTime));
-            float dist = Mathf.Lerp(distance, lookOutDistance, zoom);
-            float hgt = Mathf.Lerp(height, lookOutHeight, zoom);
+            // Auto-run never "stops": a neutral stick for idleSeconds counts as idle instead
+            bool running = target.Mode == MoveMode.AutoRun && target.State == FlyState.Walking && target.InputEnabled;
+            if (running && Mathf.Abs(InputCompat.Steer()) < 0.2f) neutralTime += Time.deltaTime;
+            else neutralTime = 0f;
+            float idleSeconds = balance != null ? balance.IdleSeconds : 1f;
+            bool idle = running && neutralTime >= idleSeconds;
+            bool stopped = target.State == FlyState.Stopped && target.TimeInState > lookOutDelay;
+            bool lookOut = !SuppressLookOut && !warned && (stopped || idle);
+
+            float sharp = balance != null ? (lookOut ? balance.ZoomOutSharpness : balance.ZoomInSharpness) : zoomSharpness;
+            zoom = Mathf.Lerp(zoom, lookOut ? 1f : 0f, 1f - Mathf.Exp(-sharp * Time.deltaTime));
+            float outDist = balance != null ? balance.LookOutDistance : lookOutDistance;
+            float outHeight = balance != null ? balance.LookOutHeight : lookOutHeight;
+            float dist = Mathf.Lerp(distance, outDist, zoom);
+            float hgt = Mathf.Lerp(height, outHeight, zoom);
 
             Vector3 desired = tp - heading * dist + up * hgt;
             transform.position = initialized

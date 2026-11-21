@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b87ec7a801182499da8a6fb73498bf0d, type: 3}
   m_Name: PlayerMoveBalance
   m_EditorClassIdentifier: FlyJam.Core::FlyJam.PlayerMoveBalance
-  maxSpeed: 6
-  turnRate: 75
+  maxSpeed: 3.6
+  turnRate: 70
   steerDeadZone: 0.15

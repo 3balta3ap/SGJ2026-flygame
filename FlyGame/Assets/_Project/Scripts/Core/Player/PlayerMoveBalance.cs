@@ -3,15 +3,16 @@ using UnityEngine;
 namespace FlyJam
 {
     /// Planner numbers for player movement. Sheet tab "Player".
-    /// Actual speed = maxSpeed x HP ratio (set by Health through SphereWalker.SpeedMultiplier).
+    /// With the Level feature (SYS_Level) on, speed and turn rate come from the "Level" table instead;
+    /// these two are the fallback when it is off. Health scales speed slightly (Health.speedAtZeroHp).
     public class PlayerMoveBalance : BalanceTable
     {
         public override string SheetName => "Player";
 
-        [Tooltip("Speed at full HP (units per second). Enemies and the female use this as 'player max speed'")]
-        [SerializeField] float maxSpeed = 6f;
-        [Tooltip("Turn speed at full stick tilt, degrees per second. Lower = wider arcs")]
-        [SerializeField] float turnRate = 75f;
+        [Tooltip("Fallback speed when the Level feature is off (units per second)")]
+        [SerializeField] float maxSpeed = 3.6f;
+        [Tooltip("Fallback turn speed at full stick tilt when the Level feature is off, degrees per second")]
+        [SerializeField] float turnRate = 70f;
         [Tooltip("Stick tilt ignored below this (0-1)")]
         [SerializeField] float steerDeadZone = 0.15f;
 

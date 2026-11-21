@@ -7,11 +7,11 @@ namespace FlyJam
     {
         public override string SheetName => "Courtship";
 
-        [Tooltip("How many buttons to press in order")]
+        [Tooltip("How many buttons to press in order. With the Level feature on, the Level table's courtLength is used instead")]
         [SerializeField] int length = 4;
         [Tooltip("How many different buttons can appear (1-4). 4 = A/B/X/Y")]
         [SerializeField] int buttonKinds = 4;
-        [Tooltip("Seconds to finish the whole order. 0 = no limit")]
+        [Tooltip("Seconds to finish the whole order. 0 = no limit. With the Level feature on, the Level table's courtTime is used instead")]
         [SerializeField] float timeLimit = 0f;
         [Tooltip("Presses in the first moment are ignored (presses from before the event do not count)")]
         [SerializeField] float inputDelay = 0.3f;

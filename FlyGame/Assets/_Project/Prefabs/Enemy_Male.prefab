@@ -1579,6 +1579,7 @@ GameObject:
   - component: {fileID: 1033967625753692495}
   - component: {fileID: 8037928781124192805}
   - component: {fileID: 3289506847104458459}
+  - component: {fileID: 8415289901817455349}
   m_Layer: 0
   m_Name: Enemy_Male
   m_TagString: Untagged
@@ -1648,6 +1649,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.ToonifyOnSpawn
   toonShader: {fileID: 4800000, guid: ec8e81d5593504135b213fc2428991d8, type: 3}
   layer: 1
+--- !u!114 &8415289901817455349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6259432642524589091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c987d120721f4c9796ffb59c40188a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Hazards::FlyJam.NightGlowEyes
+  eyes:
+  - {fileID: 1294416200644345273}
+  - {fileID: 5414873865002191819}
+  halo: {fileID: 4657100296774263284}
+  glowColor: {r: 1, g: 0.12, b: 0.08, a: 1}
+  haloNightColor: {r: 1, g: 0.25, b: 0.2, a: 1}
+  pulseSpeed: 5
+  pulseDepth: 0.35
 --- !u!1 &6486180051116190821
 GameObject:
   m_ObjectHideFlags: 0

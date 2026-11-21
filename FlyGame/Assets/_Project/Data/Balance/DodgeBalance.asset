@@ -12,9 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2621eee3108014329b3a283d8e1d6b27, type: 3}
   m_Name: DodgeBalance
   m_EditorClassIdentifier: FlyJam.Dodge::FlyJam.DodgeBalance
-  distance: 2.2
-  duration: 0.22
+  distance: 3
+  duration: 0.3
   cooldown: 0.4
-  yawKick: 25
-  steerDeadZone: 0.3
-  neutralMode: 0

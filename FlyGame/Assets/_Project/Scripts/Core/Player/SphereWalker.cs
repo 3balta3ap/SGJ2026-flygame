@@ -39,10 +39,14 @@ namespace FlyJam
         public float TimeInState { get; private set; }
         public float CurrentSpeed { get; private set; }
         public float SignedSpeed { get; private set; }
-        /// Speed before SpeedMultiplier (= "player max speed" for enemies and the female).
-        public float MoveSpeed => balance != null ? balance.MaxSpeed : moveSpeed;
-        /// AutoRun turn speed at full tilt (degrees per second).
-        public float TurnRate => balance != null ? balance.TurnRate : tankTurnSpeed;
+        /// Speed before SpeedMultiplier. The Level feature sets MaxSpeedOverride (> 0) from the level table.
+        public float MoveSpeed => MaxSpeedOverride > 0f ? MaxSpeedOverride : balance != null ? balance.MaxSpeed : moveSpeed;
+        /// AutoRun turn speed at full tilt (degrees per second). The Level feature sets TurnRateOverride (> 0).
+        public float TurnRate => TurnRateOverride > 0f ? TurnRateOverride : balance != null ? balance.TurnRate : tankTurnSpeed;
+        /// > 0 replaces MoveSpeed (Level feature: level speed x fever bonus). 0 = off.
+        public float MaxSpeedOverride { get; set; }
+        /// > 0 replaces TurnRate (Level feature). 0 = off.
+        public float TurnRateOverride { get; set; }
         public float SpeedMultiplier { get; set; } = 1f;
         /// Whether an ability currently overrides movement (e.g., Dodge).
         public bool IsOverridden => overrides.Count > 0;

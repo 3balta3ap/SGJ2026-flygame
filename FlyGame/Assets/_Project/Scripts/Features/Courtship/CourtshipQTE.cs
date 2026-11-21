@@ -8,7 +8,9 @@ namespace FlyJam
 {
     /// Courtship panel (S06, P03, E03, A05): press the shown buttons in order.
     /// All correct -> success. One wrong button (or the time limit, if set) -> failure.
-    /// Each correct press plays a rising note, so it still feels like the courtship song.
+    /// Difficulty follows the player's level ("Level" table: courtLength, courtTime) when the Level feature is on:
+    /// low levels get a long, fast dance that is nearly impossible ("もっと強くならなきゃ…" bubble on failure).
+    /// Sounds: the Audio feature listens to CourtshipInput (no sound code here).
     /// (Class name kept from the prototype's rhythm QTE so CourtshipFlow and the prefab links stay valid.)
     public class CourtshipQTE : MonoBehaviour
     {
@@ -23,19 +25,16 @@ namespace FlyJam
         [SerializeField] Color nextColor = new Color(0.35f, 0.1f, 0.2f, 1f);
         [SerializeField] Color todoColor = new Color(0.45f, 0.45f, 0.45f, 1f);
 
-        const string DoneMark = "♪";
+        [Tooltip("Speech bubble after failing a dance that was harder than the easiest one. Empty = none")]
+        [SerializeField] string hardFailBubbleKey = "bubble.court.hard";
 
-        AudioSource audioSource;
-        AudioClip wrongClip;
+        const string DoneMark = "♪";
 
         public bool Running { get; private set; }
 
         void Awake()
         {
             if (panel != null) panel.SetActive(false);
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.playOnAwake = false;
-            wrongClip = MakeBeep(220f, 0.25f);
         }
 
         public void Begin(Action<bool> onDone)
@@ -50,6 +49,13 @@ namespace FlyJam
             int length = balance != null ? balance.Length : 4;
             int kinds = balance != null ? balance.ButtonKinds : 4;
             float limit = balance != null ? balance.TimeLimit : 0f;
+            if (PlayerProgress.Active && PlayerProgress.Info.courtLength > 0)
+            {
+                length = PlayerProgress.Info.courtLength;
+                limit = Mathf.Max(0f, PlayerProgress.Info.courtTime);
+            }
+            length = Mathf.Clamp(length, 1, slots != null && slots.Length > 0 ? slots.Length : 8);
+            bool hard = length > 4 || limit > 0f;
             float wait = balance != null ? balance.InputDelay : 0.3f;
             float left = limit;
 
@@ -82,12 +88,10 @@ namespace FlyJam
                 if (step == ButtonSequence.Step.Wrong)
                 {
                     GameEvents.RaiseCourtshipInput(false);
-                    audioSource.PlayOneShot(wrongClip);
                     failKey = "court.fail.wrong";
                     break;
                 }
                 GameEvents.RaiseCourtshipInput(true);
-                audioSource.PlayOneShot(MakeBeep(660f * Mathf.Pow(2f, seq.Index / 6f), 0.12f));
                 if (step == ButtonSequence.Step.Completed)
                 {
                     success = true;
@@ -110,6 +114,7 @@ namespace FlyJam
             panel.SetActive(false);
             Running = false;
             onDone?.Invoke(success);
+            if (!success && hard && !string.IsNullOrEmpty(hardFailBubbleKey)) GameEvents.RaiseBubbleRequested(hardFailBubbleKey, 3);
         }
 
         void Refresh(ButtonSequence seq)
@@ -132,21 +137,6 @@ namespace FlyJam
             }
             if (!seq.IsComplete)
                 infoText.text = Loc.Format("court.progress", seq.Index, seq.Length, InputCompat.Label(seq.Next));
-        }
-
-        static AudioClip MakeBeep(float freq, float duration)
-        {
-            const int sampleRate = 44100;
-            int n = Mathf.Max(1, (int)(sampleRate * duration));
-            var data = new float[n];
-            for (int i = 0; i < n; i++)
-            {
-                float env = 1f - (float)i / n;
-                data[i] = Mathf.Sin(2f * Mathf.PI * freq * i / sampleRate) * 0.25f * env;
-            }
-            var clip = AudioClip.Create("beep", n, 1, sampleRate, false);
-            clip.SetData(data, 0);
-            return clip;
         }
     }
 }

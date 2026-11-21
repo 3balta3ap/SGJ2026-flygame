@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 44, y: 38}
+  m_SizeDelta: {x: 72, y: 62}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5889321635910703362
 CanvasRenderer:
@@ -227,10 +227,15 @@ MonoBehaviour:
   session: {fileID: 0}
   icon: {fileID: 8047418759025879772}
   headHeight: 0.9
-  maxDistance: 16
-  size: 44
+  edgeMargin: 0.06
+  sizeNear: 72
+  sizeFar: 36
+  distanceNear: 3
+  distanceFar: 24
   bobPixels: 6
   fadeSpeed: 8
+  seenDistance: 16
+  seenBubbleKey: bubble.mate.seen
 --- !u!1001 &555221533542242987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -253,15 +258,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5400291827962782499, guid: a427cb118db284f55b5124494b473229, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 2.04
       objectReference: {fileID: 0}
     - target: {fileID: 5400291827962782499, guid: a427cb118db284f55b5124494b473229, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.1028433
+      value: -11.82
       objectReference: {fileID: 0}
     - target: {fileID: 5400291827962782499, guid: a427cb118db284f55b5124494b473229, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.276821
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5400291827962782499, guid: a427cb118db284f55b5124494b473229, type: 3}
       propertyPath: m_LocalRotation.w

@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Player HP (S02-S04). Starts at startHp, drains over time, drops on contact, refills from apples.
-    /// Also sets the player's speed: SpeedMultiplier = max(minSpeedRatio, HP / maxHP) (S03).
+    /// Player HP (S02-S04). Starts at startHp, drains over time, drops on contact, refills from items.
+    /// Max HP grows with the level (GameEvents.MaxHpRequested from the Level feature): the new part comes filled.
+    /// Speed: SpeedMultiplier = speedAtZeroHp + (1 - speedAtZeroHp) x HP ratio (S03, small effect; the level sets the top speed).
     /// HP 0 -> GameEvents.PlayerDied("Hit" or "Starved") once. Frozen while the session is paused or ended.
     public class PlayerHealth : MonoBehaviour
     {
@@ -16,13 +17,13 @@ namespace FlyJam
         [SerializeField] GameSession session;   // Auto-filled from GameContext if null
 
         public float Current { get; private set; }
-        public float Max => balance != null ? balance.MaxHp : 10f;
+        public float Max => maxOverride > 0f ? maxOverride : balance != null ? balance.MaxHp : 10f;
         public float Ratio => Max > 0f ? Current / Max : 0f;
         public bool IsDead { get; private set; }
 
         readonly List<Renderer> blinkRenderers = new List<Renderer>();
-        float invulnerableLeft;
-        bool hidden;
+        float invulnerableLeft, maxOverride;
+        bool hidden, started;
 
         void Awake()
         {
@@ -39,6 +40,7 @@ namespace FlyJam
             GameEvents.PlayerHitBy += OnHitBy;
             GameEvents.HealRequested += OnHeal;
             GameEvents.DamageRequested += OnDamageRequested;
+            GameEvents.MaxHpRequested += OnMaxHp;
         }
 
         void OnDisable()
@@ -46,12 +48,28 @@ namespace FlyJam
             GameEvents.PlayerHitBy -= OnHitBy;
             GameEvents.HealRequested -= OnHeal;
             GameEvents.DamageRequested -= OnDamageRequested;
+            GameEvents.MaxHpRequested -= OnMaxHp;
             EndInvulnerable();
         }
 
         void Start()
         {
-            Current = balance != null ? balance.StartHp : 5f;
+            if (PlayerProgress.Active && PlayerProgress.Info.maxHp > 0f) maxOverride = PlayerProgress.Info.maxHp;
+            Current = Mathf.Min(Max, balance != null ? balance.StartHp : 5f);
+            started = true;
+            GameEvents.RaiseHealthChanged(Current, Max);
+            ApplySpeed();
+        }
+
+        /// grow = level-up: the added max HP comes filled. false = round start (just set the max).
+        void OnMaxHp(float newMax, bool grow)
+        {
+            if (newMax <= 0f) return;
+            float delta = newMax - Max;
+            maxOverride = newMax;
+            if (!started) return;   // Start() sets Current afterwards
+            if (grow && delta > 0f && !IsDead) Current += delta;
+            Current = Mathf.Clamp(Current, 0f, Max);
             GameEvents.RaiseHealthChanged(Current, Max);
             ApplySpeed();
         }
@@ -80,8 +98,8 @@ namespace FlyJam
         void ApplySpeed()
         {
             if (player == null) return;
-            float min = balance != null ? balance.MinSpeedRatio : 0.3f;
-            player.SpeedMultiplier = Mathf.Max(min, Ratio);
+            float atZero = balance != null ? balance.SpeedAtZeroHp : 0.85f;
+            player.SpeedMultiplier = atZero + (1f - atZero) * Mathf.Clamp01(Ratio);
         }
 
         void OnHitBy(IObstacle source)

@@ -29,14 +29,23 @@ MonoBehaviour:
     en: HP
     ja: "\u4F53\u529B"
   - key: hud.lowhp
-    en: Find an apple!
-    ja: "\u308A\u3093\u3054\u3092\u63A2\u305D\u3046\uFF01"
+    en: So hungry...
+    ja: "\u304A\u306A\u304B\u304C\u30DA\u30B3\u30DA\u30B3\u2026"
   - key: hud.guide.pad
     en: 'Auto-run   Left stick: turn'
     ja: "\u81EA\u52D5\u3067\u9032\u3080\u3000\u5DE6\u30B9\u30C6\u30A3\u30C3\u30AF\u3067\u66F2\u304C\u308B"
   - key: hud.guide.kb
     en: 'Auto-run   A / D: turn'
     ja: "\u81EA\u52D5\u3067\u9032\u3080\u3000A\u30FBD\u30AD\u30FC\u3067\u66F2\u304C\u308B"
+  - key: hud.lv
+    en: Lv.{0}
+    ja: Lv.{0}
+  - key: hud.lvmax
+    en: MAX
+    ja: MAX
+  - key: level.up
+    en: LEVEL UP!
+    ja: "\u30EC\u30D9\u30EB\u30A2\u30C3\u30D7\uFF01"
   - key: hazard.prompt
     en: Press {0} to dodge!
     ja: "{0}\u30DC\u30BF\u30F3\u3067\u56DE\u907F\uFF01"
@@ -88,6 +97,24 @@ MonoBehaviour:
   - key: result.retry
     en: Retry
     ja: "\u3082\u3046\u3044\u3061\u3069"
+  - key: bubble.night.1
+    en: Night looks kind of scary...
+    ja: "\u591C\u306F\u3001\u306A\u3093\u3060\u304B\u3053\u308F\u304F\u898B\u3048\u308B\u2026"
+  - key: bubble.night.2
+    en: The males are getting stronger...!
+    ja: "\u30AA\u30B9\u304C\u5F37\u304F\u306A\u3063\u3066\u308B\u2026\uFF01"
+  - key: bubble.male
+    en: A male is coming!
+    ja: "\u30AA\u30B9\u304C\u6765\u305F\uFF01"
+  - key: bubble.mate.seen
+    en: There she is!
+    ja: "\u30E1\u30B9\u3060\uFF01"
+  - key: bubble.mate.near
+    en: Maybe I can get close now...
+    ja: "\u4ECA\u306A\u3089\u8FD1\u3065\u3051\u305D\u3046\u2026"
+  - key: bubble.court.hard
+    en: I need to get stronger...
+    ja: "\u3082\u3063\u3068\u5F37\u304F\u306A\u3089\u306A\u304D\u3083\u2026"
   - key: result.love
     en: Courtship success!
     ja: "\u6C42\u611B\u6210\u529F\uFF01"
@@ -121,6 +148,9 @@ MonoBehaviour:
   - key: result.dodges
     en: DODGE! x {0:0}
     ja: "\u56DE\u907F! \xD7 {0:0}"
+  - key: result.level
+    en: 'Level reached: Lv.{0:0}'
+    ja: "\u5230\u9054\u30EC\u30D9\u30EB: Lv.{0:0}"
   - key: fact.header
     en: FLY FACT
     ja: "\u30CF\u30A8\u307E\u3081\u77E5\u8B58"

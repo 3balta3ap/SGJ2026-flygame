@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b88a032fbfdbb4c16bc5a615c5099ead, type: 3}
+  m_Name: LevelBalance
+  m_EditorClassIdentifier: FlyJam.Level::FlyJam.LevelBalance
+  dodgeExp: 1
+  feverSeconds: 3
+  feverSpeedMul: 1.2
+  feverLift: 1
+  feverBobHeight: 0.25
+  feverBobSpeed: 9
+  feverEaseSeconds: 0.3
+  levels:
+  - level: 1
+    expToNext: 3
+    maxSpeed: 3.6
+    turnRate: 70
+    maxHp: 10
+    rareItemChance: 0.05
+    courtLength: 8
+    courtTime: 2.5
+  - level: 2
+    expToNext: 4
+    maxSpeed: 3.9
+    turnRate: 80
+    maxHp: 11
+    rareItemChance: 0.08
+    courtLength: 8
+    courtTime: 2.5
+  - level: 3
+    expToNext: 5
+    maxSpeed: 4.2
+    turnRate: 90
+    maxHp: 12
+    rareItemChance: 0.12
+    courtLength: 8
+    courtTime: 3
+  - level: 4
+    expToNext: 6
+    maxSpeed: 4.5
+    turnRate: 100
+    maxHp: 13
+    rareItemChance: 0.15
+    courtLength: 7
+    courtTime: 3.5
+  - level: 5
+    expToNext: 7
+    maxSpeed: 4.8
+    turnRate: 110
+    maxHp: 14
+    rareItemChance: 0.18
+    courtLength: 6
+    courtTime: 5
+  - level: 6
+    expToNext: 8
+    maxSpeed: 5.1
+    turnRate: 120
+    maxHp: 15
+    rareItemChance: 0.21
+    courtLength: 5
+    courtTime: 6
+  - level: 7
+    expToNext: 10
+    maxSpeed: 5.4
+    turnRate: 130
+    maxHp: 16
+    rareItemChance: 0.24
+    courtLength: 4
+    courtTime: 6
+  - level: 8
+    expToNext: 12
+    maxSpeed: 5.7
+    turnRate: 140
+    maxHp: 17
+    rareItemChance: 0.27
+    courtLength: 4
+    courtTime: 0
+  - level: 9
+    expToNext: 14
+    maxSpeed: 6
+    turnRate: 150
+    maxHp: 18
+    rareItemChance: 0.3
+    courtLength: 4
+    courtTime: 0
+  - level: 10
+    expToNext: 0
+    maxSpeed: 6.3
+    turnRate: 160
+    maxHp: 19
+    rareItemChance: 0.33
+    courtLength: 4
+    courtTime: 0

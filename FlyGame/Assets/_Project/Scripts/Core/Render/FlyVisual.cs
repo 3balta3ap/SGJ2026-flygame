@@ -7,8 +7,10 @@ namespace FlyJam
     public class FlyVisual : MonoBehaviour
     {
         [SerializeField] SphereWalker walker;
-        /// Reverses leg gait phase when the visual faces backward (set by the Backpedal feature).
+        /// Reverses leg gait phase when the visual faces backward (kept for compatibility, unused).
         public bool ReverseGait { get; set; }
+        /// Flying pose: wings flap fast, legs tucked, body bobs (Level feature: level-up fever).
+        public bool Flying { get; set; }
         [SerializeField] Transform bodyRoot;
         [Tooltip("Order: L1, R1, L2, R2, L3, R3 (1 = front legs)")]
         [SerializeField] Transform[] legs = new Transform[6];
@@ -62,6 +64,11 @@ namespace FlyJam
         void LateUpdate()
         {
             float dt = Time.deltaTime;
+            if (Flying && (walker.State == FlyState.Walking || walker.State == FlyState.Stopped))
+            {
+                Celebrate(dt);
+                return;
+            }
             switch (walker.State)
             {
                 case FlyState.Walking: Walk(dt); break;

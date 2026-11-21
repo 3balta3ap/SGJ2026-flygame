@@ -5,7 +5,8 @@ namespace FlyJam
 {
     /// Enemy / obstacle that circles the planet along its heading (a great circle), passing through props like trees (C04-C08).
     /// Per prefab: the look (rolling ball, or a creature facing its path with an optional hover bob).
-    /// Per type row (HazardBalance.TypeRow from ObstacleSpawner.Launch): damage, warning, chase, stop-on-hit, rival.
+    /// Per type row (HazardBalance.TypeRow from ObstacleSpawner.Launch): damage, warning, chase, stop-on-hit/dodge, rival,
+    /// and day/night strength (male: faster and shorter chase cooldown as days pass and at night).
     /// Freezes while the session is paused (courtship, mash battle, pause menu) - E04.
     public class RollingObstacle : MonoBehaviour, IMovingObstacle, IDamageSource
     {
@@ -37,8 +38,9 @@ namespace FlyJam
         HazardBalance.TypeRow row;
         bool hasRow;
         Vector3 dir, visualBase;
-        float speed, travelled, maxTravel, stopLeft, bobPhase;
+        float speed, travelled, maxTravel, stopLeft, bobPhase, cooldownLeft;
         bool chasing, dangerous;
+        GameSession session;
 
         public Vector3 Position => transform.position;
         public float HitRadius => radius;
@@ -49,6 +51,9 @@ namespace FlyJam
         /// Approaching this one triggers the warning (E01).
         public bool Warns => !hasRow || row.warn;
         public bool IsRival => hasRow && row.rival;
+        /// Day/night strength multiplier on speed (1 = base). Male: (1 + daySpeedUp x day) x (1 + nightSpeedUp at night).
+        public float Strength { get; private set; } = 1f;
+        public bool IsChaseCoolingDown => cooldownLeft > 0f;
         /// Fraction of max HP lost on contact. -1 = let Health use its default. 0 for the male (mash battle instead).
         public float DamageRatio => !hasRow ? -1f : row.rival ? 0f : row.damageRatio;
 
@@ -116,17 +121,52 @@ namespace FlyJam
             if (!ReferenceEquals(source, this)) return;
             if (IsRival) GameEvents.RaiseRivalEncounter(this);   // male: mash battle (Rival feature)
             if (row.stopOnHit <= 0f) return;
-            stopLeft = row.stopOnHit;
+            Stop(row.stopOnHit);
+        }
+
+        /// The player dashed while warned about this enemy (NearMissDirector). With stopOnDodge > 0 it freezes
+        /// for that long (harmless), then goes straight for chaseCooldown before it may chase again.
+        /// Returns true when it stopped (counts as a dodge success right away).
+        public bool OnDodged()
+        {
+            if (!hasRow || row.stopOnDodge <= 0f) return false;
+            Stop(row.stopOnDodge);
+            return true;
+        }
+
+        void Stop(float seconds)
+        {
+            stopLeft = seconds;
             chasing = false;
+            cooldownLeft = CooldownSeconds();
             SetDangerous(false);   // harmless while stopped: no hit, no warning
+        }
+
+        float CooldownSeconds()
+        {
+            if (!hasRow || row.chaseCooldown <= 0f) return 0f;
+            int day = session != null ? session.DayIndex : 0;
+            bool night = session != null && session.IsNight;
+            float cut = Mathf.Max(0.2f, 1f - row.dayCooldownCut * day);
+            if (night) cut *= Mathf.Clamp01(1f - row.nightCooldownCut);
+            return row.chaseCooldown * cut;
+        }
+
+        void UpdateStrength()
+        {
+            if (!hasRow || session == null) { Strength = 1f; return; }
+            float s = 1f + row.daySpeedUp * session.DayIndex;
+            if (session.IsNight) s *= 1f + row.nightSpeedUp;
+            Strength = Mathf.Max(0.1f, s);
         }
 
         void Update()
         {
             if (planet == null) return;
-            var ctx = GameContext.Current;
-            if (ctx != null && ctx.Session != null && ctx.Session.IsPaused) return;   // E04
+            if (session == null && GameContext.Current != null) session = GameContext.Current.Session;
+            if (session != null && session.IsPaused) return;   // E04
             Bob();
+            UpdateStrength();
 
             if (stopLeft > 0f)
             {
@@ -134,11 +174,12 @@ namespace FlyJam
                 if (stopLeft <= 0f) SetDangerous(true);
                 return;
             }
+            if (cooldownLeft > 0f) cooldownLeft -= Time.deltaTime;
 
             Vector3 up = planet.UpAt(transform.position);
             if (row.chase && target != null) Steer(up);
 
-            float step = speed * Time.deltaTime;
+            float step = speed * Strength * Time.deltaTime;
             transform.position = planet.SnapToSurface(transform.position + dir * step, radius);
             up = planet.UpAt(transform.position);
             dir = Vector3.ProjectOnPlane(dir, up).normalized;
@@ -156,6 +197,7 @@ namespace FlyJam
 
         void Steer(Vector3 up)
         {
+            if (cooldownLeft > 0f) { chasing = false; return; }   // goes straight after being stopped
             float dist = Vector3.Distance(transform.position, target.position);
             if (!chasing && dist <= row.detectRadius) chasing = true;
             else if (chasing && dist > row.loseRadius) chasing = false;

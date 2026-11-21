@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 685bd7261a61e480287f62013bbbda49, type: 3}
   m_Name: MateBalance
   m_EditorClassIdentifier: FlyJam.Mate::FlyJam.MateBalance
-  speedRatio: 0.5
+  speed: 4.4
+  shyUntilLevel: 3
+  shyFleeRadius: 18
+  shyReleaseRadius: 20
   fleeRadius: 5
   releaseRadius: 8
   failFleeSeconds: 2

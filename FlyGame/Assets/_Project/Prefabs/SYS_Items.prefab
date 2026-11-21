@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2167774108492910987}
+  - component: {fileID: 899336906430687162}
   m_Layer: 0
   m_Name: P1
   m_TagString: Untagged
@@ -31,6 +32,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &899336906430687162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796135395184268915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &1324574201837336646
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,6 +54,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5643311361551736704}
+  - component: {fileID: 5826464086010963083}
   m_Layer: 0
   m_Name: P2
   m_TagString: Untagged
@@ -62,6 +77,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5826464086010963083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324574201837336646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &2884064645433429459
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,6 +136,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FlyJam.Items::FlyJam.AppleSpawner
   balance: {fileID: 11400000, guid: 3056c805b4d74459d9b9dcb5738057b7, type: 2}
+  prefabs:
+  - id: apple
+    prefab: {fileID: 3423740590713250836, guid: 13f3a15bb30594024b69d674469ee533, type: 3}
+  - id: banana
+    prefab: {fileID: 3653978207655513405, guid: c97cb96de8c6046a098a0b43c6278499, type: 3}
   applePrefab: {fileID: 3423740590713250836, guid: 13f3a15bb30594024b69d674469ee533, type: 3}
   points:
   - {fileID: 5045417267331318403}
@@ -130,6 +163,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5666466767970637899}
+  - component: {fileID: 855617285728058197}
   m_Layer: 0
   m_Name: P3
   m_TagString: Untagged
@@ -152,6 +186,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &855617285728058197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4243285971853564430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &4483547609273197723
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,6 +247,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5045417267331318403}
+  - component: {fileID: 6672290822410176990}
   m_Layer: 0
   m_Name: P0
   m_TagString: Untagged
@@ -222,6 +270,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6672290822410176990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5270077020582659491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &5565004693442983893
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +292,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 200676756175281677}
+  - component: {fileID: 6769271768443586540}
   m_Layer: 0
   m_Name: P6
   m_TagString: Untagged
@@ -253,6 +315,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6769271768443586540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5565004693442983893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &6147977590288279083
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,6 +337,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4733230144139460787}
+  - component: {fileID: 2360799679694504345}
   m_Layer: 0
   m_Name: P7
   m_TagString: Untagged
@@ -284,6 +360,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2360799679694504345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6147977590288279083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &6631123657205171527
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,6 +382,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5957360181922611487}
+  - component: {fileID: 8558964515453946623}
   m_Layer: 0
   m_Name: P5
   m_TagString: Untagged
@@ -315,6 +405,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8558964515453946623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6631123657205171527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2
 --- !u!1 &8593535594216722779
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,6 +427,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9020110477159112990}
+  - component: {fileID: 6180487250014798631}
   m_Layer: 0
   m_Name: P4
   m_TagString: Untagged
@@ -346,3 +450,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2798375587372441951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6180487250014798631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8593535594216722779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.KeepClearZone
+  radius: 1.2

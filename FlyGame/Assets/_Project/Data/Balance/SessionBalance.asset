@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2578a85b71c44897ae698ed08940943, type: 3}
   m_Name: SessionBalance
   m_EditorClassIdentifier: FlyJam.Core::FlyJam.SessionBalance
-  dayLength: 60
+  dayLength: 80
+  nightStart: 0.778
   resultDelay: 1.5
