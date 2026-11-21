@@ -80,4 +80,4 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 
 Text: Kazuki Nishimura
 
-文章：西村和貴
+文章：西村 和貴
