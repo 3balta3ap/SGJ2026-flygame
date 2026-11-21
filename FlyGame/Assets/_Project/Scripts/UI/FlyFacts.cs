@@ -4,15 +4,15 @@ namespace FlyJam
 {
     public static class FlyFacts
     {
-        static readonly string[] facts =
+        /// Picks one of "fact.1", "fact.2", ... from the text table. Add rows in the sheet to add facts.
+        public static string Pick()
         {
-            "Fruit flies dodge obstacles hundreds of times faster than today's robots.",
-            "Motion-blind fruit flies can't see things while they move. When an object stops, it seems to pop into view.",
-            "Even without sight, a fruit fly stops when something is in front of it. Its antennae seem to feel the air flow.",
-            "Blind fruit flies may also notice shadows with light receptors. (Research in progress)",
-            "A male fruit fly sings a courtship song to the female - sometimes hundreds of times.",
-        };
+            int count = 0;
+            while (count < 99 && Loc.Has("fact." + (count + 1))) count++;
 
-        public static string Pick() => "FLY FACT\n" + facts[Random.Range(0, facts.Length)];
+            string header = Loc.Get("fact.header");
+            if (count == 0) return header;
+            return header + "\n" + Loc.Get("fact." + Random.Range(1, count + 1));
+        }
     }
 }

@@ -3,7 +3,8 @@
     "rootNamespace": "FlyJam",
     "references": [
         "FlyJam.Core",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "autoReferenced": true
 }

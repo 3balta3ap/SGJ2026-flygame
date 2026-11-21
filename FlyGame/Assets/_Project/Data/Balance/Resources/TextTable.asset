@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89fbabfd3b1a2439e9b52974fdd9378f, type: 3}
+  m_Name: TextTable
+  m_EditorClassIdentifier: FlyJam.Core::FlyJam.TextTable
+  entries:
+  - key: title.name
+    en: LITTLE FLY PLANET
+    ja: "\u3061\u3044\u3055\u306A\u30CF\u30A8\u306E\u307B\u3057"
+  - key: title.press
+    en: Press SPACE
+    ja: "SPACE\u3067\u30B9\u30BF\u30FC\u30C8"
+  - key: title.language
+    en: "\u65E5\u672C\u8A9E"
+    ja: English
+  - key: hazard.prompt
+    en: SPACE!
+    ja: SPACE!
+  - key: hazard.dodge
+    en: DODGE!
+    ja: "\u56DE\u907F!"
+  - key: court.sing
+    en: SING!
+    ja: "\u3046\u305F\u3063\u3066!"
+  - key: court.good
+    en: GOOD!
+    ja: "\u3044\u3044\u306D!"
+  - key: court.miss
+    en: MISS
+    ja: "\u30DF\u30B9"
+  - key: court.ready
+    en: READY {0}
+    ja: "\u3088\u30FC\u3044 {0}"
+  - key: court.love
+    en: <3 LOVE <3
+    ja: "<3 \u30E9\u30D6 <3"
+  - key: court.ranaway
+    en: She ran away...
+    ja: "\u306B\u3052\u3089\u308C\u305F\u2026"
+  - key: result.love
+    en: LOVE!
+    ja: "\u30E9\u30D6!"
+  - key: result.hit
+    en: OUCH!
+    ja: "\u3044\u305F\u3063!"
+  - key: result.timeup
+    en: TIME UP
+    ja: "\u30BF\u30A4\u30E0\u30A2\u30C3\u30D7"
+  - key: result.clear
+    en: CLEAR!
+    ja: "\u30AF\u30EA\u30A2!"
+  - key: result.failed
+    en: FAILED
+    ja: "\u3057\u3063\u3071\u3044"
+  - key: result.best
+    en: 'Your best dodge reaction: {0:0.00}s'
+    ja: "\u3042\u306A\u305F\u306E\u6700\u901F\u306E\u56DE\u907F\u53CD\u5FDC: {0:0.00}\u79D2"
+  - key: result.lab
+    en: 'Fruit fly (lab data): about 0.2-0.3s'
+    ja: "\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8(\u5B9F\u9A13\u30C7\u30FC\u30BF): \u7D040.2\u301C0.3\u79D2"
+  - key: result.dodges
+    en: DODGE! x {0:0}
+    ja: "\u56DE\u907F! \xD7 {0:0}"
+  - key: result.controls
+    en: 'SPACE: Retry   ESC: Title'
+    ja: "SPACE: \u3082\u3046\u4E00\u56DE   ESC: \u30BF\u30A4\u30C8\u30EB"
+  - key: fact.header
+    en: FLY FACT
+    ja: "\u30CF\u30A8\u307E\u3081\u77E5\u8B58"
+  - key: fact.1
+    en: Fruit flies dodge obstacles hundreds of times faster than today's robots.
+    ja: "\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306F\u3001\u4ECA\u306E\u30ED\u30DC\u30C3\u30C8\u3088\u308A\u4F55\u767E\u500D\u3082\u901F\u304F\u969C\u5BB3\u7269\u3092\u3088\u3051\u308B\u3002"
+  - key: fact.2
+    en: Motion-blind fruit flies can't see things while they move. When an object stops, it seems to pop into view.
+    ja: "\u904B\u52D5\u76F2\u306E\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306B\u306F\u3001\u52D5\u3044\u3066\u3044\u308B\u7269\u304C\u898B\u3048\u306A\u3044\u3002\u7269\u304C\u6B62\u307E\u308B\u3068\u3001\u6025\u306B\u898B\u3048\u308B\u3088\u3046\u306B\u306A\u308B\u3089\u3057\u3044\u3002"
+  - key: fact.3
+    en: Even without sight, a fruit fly stops when something is in front of it. Its antennae seem to feel the air flow.
+    ja: "\u76EE\u304C\u898B\u3048\u306A\u304F\u3066\u3082\u3001\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306F\u524D\u306B\u4F55\u304B\u3042\u308B\u3068\u6B62\u307E\u308B\u3002\u89E6\u89D2\u3067\u7A7A\u6C17\u306E\u6D41\u308C\u3092\u611F\u3058\u3066\u3044\u308B\u3089\u3057\u3044\u3002"
+  - key: fact.4
+    en: Blind fruit flies may also notice shadows with light receptors. (Research in progress)
+    ja: "\u76EE\u306E\u898B\u3048\u306A\u3044\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u3082\u3001\u5149\u53D7\u5BB9\u4F53\u3067\u5F71\u306B\u6C17\u3065\u304F\u306E\u304B\u3082\u3057\u308C\u306A\u3044\u3002(\u7814\u7A76\u4E2D)"
+  - key: fact.5
+    en: A male fruit fly sings a courtship song to the female - sometimes hundreds of times.
+    ja: "\u30AA\u30B9\u306E\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306F\u3001\u30E1\u30B9\u306B\u6C42\u611B\u306E\u6B4C\u3092\u3046\u305F\u3046\u3002\u3068\u304D\u306B\u306F\u4F55\u767E\u56DE\u3082\u3002"

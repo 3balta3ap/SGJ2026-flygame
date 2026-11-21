@@ -43,7 +43,7 @@ namespace FlyJam
         {
             Running = true;
             panel.SetActive(true);
-            judgeText.text = "SING!";
+            judgeText.text = Loc.Get("court.sing");
 
             float beat = 60f / bpm;
             bool[] judged = new bool[notes];
@@ -73,9 +73,9 @@ namespace FlyJam
                         judged[n] = true;
                         hits++;
                         audioSource.PlayOneShot(hitClip);
-                        judgeText.text = "GOOD!";
+                        judgeText.text = Loc.Get("court.good");
                     }
-                    else judgeText.text = "MISS";
+                    else judgeText.text = Loc.Get("court.miss");
                 }
 
                 int countdown = now < countIn * beat ? Mathf.Clamp(countIn - beatIdx, 1, countIn) : 0;
@@ -84,7 +84,7 @@ namespace FlyJam
             }
 
             bool success = hits >= needed;
-            judgeText.text = success ? "<3 LOVE <3" : "She ran away...";
+            judgeText.text = Loc.Get(success ? "court.love" : "court.ranaway");
             yield return new WaitForSecondsRealtime(0.9f);
             panel.SetActive(false);
             Running = false;
@@ -94,7 +94,7 @@ namespace FlyJam
         static string BuildBeats(int current, bool[] judged, int countdown)
         {
             var sb = new StringBuilder();
-            sb.Append(countdown > 0 ? $"<size=60%>READY {countdown}</size>\n" : "\n");
+            sb.Append(countdown > 0 ? "<size=60%>" + Loc.Format("court.ready", countdown) + "</size>\n" : "\n");
             for (int i = 0; i < judged.Length; i++)
             {
                 if (judged[i]) sb.Append("<color=#FF6FA5>X</color>");

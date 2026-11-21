@@ -18,27 +18,28 @@ namespace FlyJam
             var sb = new StringBuilder();
             if (SessionResult.TryGetStat("reaction.best", out float best))
             {
-                sb.AppendLine($"Your best dodge reaction: {best:0.00}s");
-                sb.AppendLine("Fruit fly (lab data): about 0.2-0.3s");
+                sb.AppendLine(Loc.Format("result.best", best));
+                sb.AppendLine(Loc.Get("result.lab"));
             }
             if (SessionResult.TryGetStat("dodge.perfect", out float perfect))
-                sb.AppendLine($"PERFECT dodges: {perfect:0}");
+                sb.AppendLine(Loc.Format("result.dodges", perfect));
             sb.AppendLine();
-            sb.Append("SPACE: Retry   ESC: Title");
+            sb.Append(Loc.Get("result.controls"));
             detailText.text = sb.ToString();
 
             if (factText != null) factText.text = FlyFacts.Pick();
         }
 
+        /// Title = text key "result.<reason in lower case>" (Love -> result.love, Hit -> result.hit).
+        /// A new end reason only needs a new row in the sheet's Text tab.
         static string TitleFor(string reason, bool cleared)
         {
-            switch (reason)
+            if (!string.IsNullOrEmpty(reason))
             {
-                case "Love": return "LOVE!";
-                case "Hit": return "OUCH!";
-                case "TimeUp": return "TIME UP";
-                default: return cleared ? "CLEAR!" : "FAILED";
+                string key = "result." + reason.ToLowerInvariant();
+                if (Loc.Has(key)) return Loc.Get(key);
             }
+            return Loc.Get(cleared ? "result.clear" : "result.failed");
         }
 
         void Update()
