@@ -16,45 +16,96 @@ MonoBehaviour:
   - key: title.name
     en: LITTLE FLY PLANET
     ja: "\u3061\u3044\u3055\u306A\u30CF\u30A8\u306E\u307B\u3057"
-  - key: title.press
-    en: Press SPACE
-    ja: "SPACE\u3067\u30B9\u30BF\u30FC\u30C8"
+  - key: title.goal
+    en: Find the female fly and win her heart!
+    ja: "\u30E1\u30B9\u306E\u30CF\u30A8\u3092\u898B\u3064\u3051\u3066\u3001\u6C42\u611B\u3057\u3088\u3046\uFF01"
+  - key: title.play
+    en: PLAY
+    ja: "\u3042\u305D\u3076"
   - key: title.language
     en: "\u65E5\u672C\u8A9E"
     ja: English
+  - key: hud.hp
+    en: HP
+    ja: "\u4F53\u529B"
+  - key: hud.lowhp
+    en: Find an apple!
+    ja: "\u308A\u3093\u3054\u3092\u63A2\u305D\u3046\uFF01"
+  - key: hud.guide.pad
+    en: 'Auto-run   Left stick: turn'
+    ja: "\u81EA\u52D5\u3067\u9032\u3080\u3000\u5DE6\u30B9\u30C6\u30A3\u30C3\u30AF\u3067\u66F2\u304C\u308B"
+  - key: hud.guide.kb
+    en: 'Auto-run   A / D: turn'
+    ja: "\u81EA\u52D5\u3067\u9032\u3080\u3000A\u30FBD\u30AD\u30FC\u3067\u66F2\u304C\u308B"
   - key: hazard.prompt
-    en: SPACE!
-    ja: SPACE!
+    en: Press {0} to dodge!
+    ja: "{0}\u30DC\u30BF\u30F3\u3067\u56DE\u907F\uFF01"
   - key: hazard.dodge
     en: DODGE!
     ja: "\u56DE\u907F!"
-  - key: court.sing
-    en: SING!
-    ja: "\u3046\u305F\u3063\u3066!"
-  - key: court.good
-    en: GOOD!
-    ja: "\u3044\u3044\u306D!"
-  - key: court.miss
-    en: MISS
-    ja: "\u30DF\u30B9"
-  - key: court.ready
-    en: READY {0}
-    ja: "\u3088\u30FC\u3044 {0}"
-  - key: court.love
-    en: <3 LOVE <3
-    ja: "<3 \u30E9\u30D6 <3"
-  - key: court.ranaway
-    en: She ran away...
-    ja: "\u306B\u3052\u3089\u308C\u305F\u2026"
+  - key: court.title
+    en: Press the buttons in order!
+    ja: "\u9806\u756A\u306B\u30DC\u30BF\u30F3\u3092\u62BC\u305D\u3046\uFF01"
+  - key: court.progress
+    en: '{0}/{1}   Next: {2}'
+    ja: "{0}\uFF0F{1}\u3000\u6B21\u306F{2}"
+  - key: court.success
+    en: Courtship success!
+    ja: "\u6C42\u611B\u6210\u529F\uFF01"
+  - key: court.fail.title
+    en: Courtship failed
+    ja: "\u6C42\u611B\u5931\u6557"
+  - key: court.fail.wrong
+    en: Wrong button!
+    ja: "\u30DC\u30BF\u30F3\u306E\u9806\u756A\u304C\u9055\u3063\u305F\uFF01"
+  - key: court.fail.time
+    en: Time up!
+    ja: "\u6642\u9593\u5207\u308C\uFF01"
+  - key: rival.title
+    en: Mash battle with a male!
+    ja: "\u30AA\u30B9\u3068\u9023\u6253\u30D0\u30C8\u30EB\uFF01"
+  - key: rival.prompt
+    en: Mash {0}!
+    ja: "{0}\u3092\u9023\u6253\uFF01"
+  - key: rival.count
+    en: '{0}/{1}'
+    ja: "{0}\uFF0F{1}"
+  - key: rival.win
+    en: You won!
+    ja: "\u9023\u6253\u6210\u529F\uFF01"
+  - key: rival.lose
+    en: Time up...
+    ja: "\u6642\u9593\u5207\u308C\u2026"
+  - key: pause.title
+    en: PAUSED
+    ja: "\u4E00\u6642\u505C\u6B62"
+  - key: pause.resume
+    en: Resume
+    ja: "\u3064\u3065\u3051\u308B"
+  - key: menu.totitle
+    en: Back to title
+    ja: "\u30BF\u30A4\u30C8\u30EB\u306B\u623B\u308B"
+  - key: result.retry
+    en: Retry
+    ja: "\u3082\u3046\u3044\u3061\u3069"
   - key: result.love
-    en: LOVE!
-    ja: "\u30E9\u30D6!"
+    en: Courtship success!
+    ja: "\u6C42\u611B\u6210\u529F\uFF01"
+  - key: result.love.sub
+    en: You met the female fly.
+    ja: "\u30E1\u30B9\u306E\u30CF\u30A8\u306B\u51FA\u4F1A\u3048\u305F"
   - key: result.hit
-    en: OUCH!
-    ja: "\u3044\u305F\u3063!"
-  - key: result.timeup
-    en: TIME UP
-    ja: "\u30BF\u30A4\u30E0\u30A2\u30C3\u30D7"
+    en: Out of HP!
+    ja: "\u4F53\u529B\u304C\u306A\u304F\u306A\u3063\u305F\uFF01"
+  - key: result.hit.sub
+    en: Eat red apples to recover HP.
+    ja: "\u8D64\u308A\u3093\u3054\u3067\u4F53\u529B\u3092\u56DE\u5FA9\u3057\u3088\u3046"
+  - key: result.starved
+    en: Out of HP!
+    ja: "\u4F53\u529B\u304C\u306A\u304F\u306A\u3063\u305F\uFF01"
+  - key: result.starved.sub
+    en: Eat red apples to recover HP.
+    ja: "\u8D64\u308A\u3093\u3054\u3067\u4F53\u529B\u3092\u56DE\u5FA9\u3057\u3088\u3046"
   - key: result.clear
     en: CLEAR!
     ja: "\u30AF\u30EA\u30A2!"
@@ -70,9 +121,6 @@ MonoBehaviour:
   - key: result.dodges
     en: DODGE! x {0:0}
     ja: "\u56DE\u907F! \xD7 {0:0}"
-  - key: result.controls
-    en: 'SPACE: Retry   ESC: Title'
-    ja: "SPACE: \u3082\u3046\u4E00\u56DE   ESC: \u30BF\u30A4\u30C8\u30EB"
   - key: fact.header
     en: FLY FACT
     ja: "\u30CF\u30A8\u307E\u3081\u77E5\u8B58"
@@ -91,9 +139,3 @@ MonoBehaviour:
   - key: fact.5
     en: A male fruit fly sings a courtship song to the female - sometimes hundreds of times.
     ja: "\u30AA\u30B9\u306E\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306F\u3001\u30E1\u30B9\u306B\u6C42\u611B\u306E\u6B4C\u3092\u3046\u305F\u3046\u3002\u3068\u304D\u306B\u306F\u4F55\u767E\u56DE\u3082\u3002"
-  - key: hud.hp
-    en: HP
-    ja: HP
-  - key: result.starved
-    en: STARVED
-    ja: "\u306F\u3089\u307A\u3053\u2026"

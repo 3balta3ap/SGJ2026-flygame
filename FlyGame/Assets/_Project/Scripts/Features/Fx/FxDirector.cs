@@ -2,11 +2,14 @@ using UnityEngine;
 
 namespace FlyJam
 {
+    /// One-shot particle effects for gameplay events. Listens to GameEvents only.
     public class FxDirector : MonoBehaviour
     {
         [SerializeField] Planet planet;
         [SerializeField] Transform player;
         [SerializeField] ParticleSystem dodgeTrail, hitBurst, heartBurst, matePop, perfectBurst;
+        [Tooltip("Apple pickup burst. Empty = uses perfectBurst")]
+        [SerializeField] ParticleSystem appleBurst;
 
         void Awake()
         {
@@ -30,6 +33,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished += OnCourtship;
             GameEvents.MateAppeared += OnMateAppeared;
             GameEvents.PerfectDodge += OnPerfect;
+            GameEvents.AppleEaten += OnApple;
         }
 
         void OnDisable()
@@ -39,6 +43,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished -= OnCourtship;
             GameEvents.MateAppeared -= OnMateAppeared;
             GameEvents.PerfectDodge -= OnPerfect;
+            GameEvents.AppleEaten -= OnApple;
         }
 
         void OnDodged(Vector3 pos, Vector3 dir)
@@ -57,6 +62,8 @@ namespace FlyJam
         void OnMateAppeared(Vector3 pos) => PlayUp(matePop, pos, 0.3f);
 
         void OnPerfect() => PlayUp(perfectBurst, player.position, 0.4f);
+
+        void OnApple(Vector3 pos) => PlayUp(appleBurst != null ? appleBurst : perfectBurst, pos, 0.4f);
 
         void PlayUp(ParticleSystem ps, Vector3 pos, float lift)
         {

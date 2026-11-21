@@ -57,7 +57,7 @@ namespace FlyJam
         {
             if (worldCamera == null || planet == null) return;
 
-            T = session != null ? session.Normalized : Mathf.Repeat(Time.time / idleCycleSeconds, 1f);
+            T = session != null ? session.DayProgress : Mathf.Repeat(Time.time / idleCycleSeconds, 1f);
             NightFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(nightStart - 0.08f, nightStart + 0.04f, T));
 
             Vector3 up = planet.UpAt(worldCamera.transform.position);

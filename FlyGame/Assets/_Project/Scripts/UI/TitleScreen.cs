@@ -3,18 +3,13 @@ using UnityEngine.EventSystems;
 
 namespace FlyJam
 {
+    /// Title (S01, A06). Buttons: あそぶ (StartGame) and the language button (ToggleLanguage), driven by MenuNavigator.
     public class TitleScreen : MonoBehaviour
     {
-        void Start() => Time.timeScale = 1f;
-
-        void Update()
-        {
-            if (InputCompat.ConfirmPressed()) StartGame();
-        }
+        void Start() => TimeControl.ResetAll();
 
         public void StartGame() => SceneFlow.GoToGame();
 
-        /// Language button OnClick. Deselects the button so Space/Enter only starts the game.
         public void ToggleLanguage()
         {
             Loc.Toggle();

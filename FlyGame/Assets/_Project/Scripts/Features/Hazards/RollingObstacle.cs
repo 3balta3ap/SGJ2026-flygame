@@ -3,17 +3,18 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Enemy / obstacle that travels along the planet surface (great circle), passing through props like trees.
+    /// Enemy / obstacle that circles the planet along its heading (a great circle), passing through props like trees (C04-C08).
     /// Per prefab: the look (rolling ball, or a creature facing its path with an optional hover bob).
-    /// Per type row (HazardBalance.TypeRow, given by ObstacleSpawner.Launch): chase and stop-on-hit.
-    public class RollingObstacle : MonoBehaviour, IMovingObstacle
+    /// Per type row (HazardBalance.TypeRow from ObstacleSpawner.Launch): damage, warning, chase, stop-on-hit, rival.
+    /// Freezes while the session is paused (courtship, mash battle, pause menu) - E04.
+    public class RollingObstacle : MonoBehaviour, IMovingObstacle, IDamageSource
     {
         static readonly List<RollingObstacle> active = new List<RollingObstacle>();
         static readonly List<RollingObstacle> alive = new List<RollingObstacle>();
 
-        /// Dangerous right now (moving, can hit). Near-miss window and reaction tracking use this.
+        /// Dangerous right now (moving, can hit). Warning and reaction tracking use this.
         public static IReadOnlyList<RollingObstacle> Active => active;
-        /// Every spawned instance, including ones stopped after a hit. The spawner limit uses this.
+        /// Every spawned instance, including ones stopped after a hit. The spawner counts these.
         public static IReadOnlyList<RollingObstacle> Alive => alive;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -34,6 +35,7 @@ namespace FlyJam
         Planet planet;
         Transform target;
         HazardBalance.TypeRow row;
+        bool hasRow;
         Vector3 dir, visualBase;
         float speed, travelled, maxTravel, stopLeft, bobPhase;
         bool chasing, dangerous;
@@ -43,11 +45,21 @@ namespace FlyJam
         public bool IsMoving => stopLeft <= 0f;
         public Vector3 Direction => dir;
         public bool IsChasing => chasing;
+        public string TypeId => hasRow ? row.id : "";
+        /// Approaching this one triggers the warning (E01).
+        public bool Warns => !hasRow || row.warn;
+        public bool IsRival => hasRow && row.rival;
+        /// Fraction of max HP lost on contact. -1 = let Health use its default. 0 for the male (mash battle instead).
+        public float DamageRatio => !hasRow ? -1f : row.rival ? 0f : row.damageRatio;
 
         /// Old signature (no type row): behaves like the original acorn.
-        public void Launch(Planet p, Vector3 surfacePos, Vector3 direction, float spd, float maxDistance) =>
+        public void Launch(Planet p, Vector3 surfacePos, Vector3 direction, float spd, float maxDistance)
+        {
             Launch(p, surfacePos, direction, spd, maxDistance, default, null);
+            hasRow = false;
+        }
 
+        /// maxDistance <= 0: never disappears (keeps circling the planet).
         public void Launch(Planet p, Vector3 surfacePos, Vector3 direction, float spd, float maxDistance,
                            HazardBalance.TypeRow type, Transform chaseTarget)
         {
@@ -55,6 +67,7 @@ namespace FlyJam
             speed = spd;
             maxTravel = maxDistance;
             row = type;
+            hasRow = true;
             target = chaseTarget;
             transform.position = p.SnapToSurface(surfacePos, radius);
             Vector3 up = p.UpAt(transform.position);
@@ -100,15 +113,19 @@ namespace FlyJam
 
         void OnPlayerHitBy(IObstacle source)
         {
-            if (!ReferenceEquals(source, this) || row.stopOnHit <= 0f) return;
+            if (!ReferenceEquals(source, this)) return;
+            if (IsRival) GameEvents.RaiseRivalEncounter(this);   // male: mash battle (Rival feature)
+            if (row.stopOnHit <= 0f) return;
             stopLeft = row.stopOnHit;
             chasing = false;
-            SetDangerous(false);   // harmless while stopped: no hit, no near-miss window
+            SetDangerous(false);   // harmless while stopped: no hit, no warning
         }
 
         void Update()
         {
             if (planet == null) return;
+            var ctx = GameContext.Current;
+            if (ctx != null && ctx.Session != null && ctx.Session.IsPaused) return;   // E04
             Bob();
 
             if (stopLeft > 0f)
@@ -130,8 +147,11 @@ namespace FlyJam
             if (rollVisual && visual != null)
                 visual.Rotate(Vector3.Cross(up, dir), step / radius * Mathf.Rad2Deg, Space.World);
 
-            travelled += step;
-            if (travelled >= maxTravel) Destroy(gameObject);
+            if (maxTravel > 0f)
+            {
+                travelled += step;
+                if (travelled >= maxTravel) Destroy(gameObject);
+            }
         }
 
         void Steer(Vector3 up)

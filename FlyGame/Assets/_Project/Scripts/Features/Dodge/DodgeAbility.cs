@@ -2,20 +2,16 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Quick-turn dodge (Space). Space+A/D = sidestep, Space+S = backstep, Space+W = dash forward, Space alone = sidestep away from nearest moving threat.
-    /// Temporarily overrides SphereWalker movement (BeginOverride) and enables invulnerability (SetInvulnerable).
-    /// Removing this component disables dodging cleanly without affecting any other system.
+    /// Dodge (P04). Only while a warning is on (GameEvents.WarningChanged); the action button does nothing otherwise.
+    /// Stick left/right = dodge that way (relative to the fly). Neutral = DodgeBalance.neutralMode.
+    /// Temporarily overrides SphereWalker movement (BeginOverride) and makes the fly invulnerable for the dodge.
     [DefaultExecutionOrder(-10)]   // Reads input before SphereWalker.Update
     public class DodgeAbility : MonoBehaviour
     {
         [SerializeField] SphereWalker walker;            // Auto-filled from GameContext.Player if null
-        [SerializeField] float distance = 2.2f;
-        [SerializeField] float duration = 0.22f;
-        [SerializeField] float cooldown = 0.7f;
-        [SerializeField] float yawKick = 25f;
-        [SerializeField] float threatSearchRadius = 6f;
-        [SerializeField] float inputDeadZone = 0.1f;
+        [SerializeField] DodgeBalance balance;
 
+        IMovingObstacle threat;
         float timer, cd, yawSign;
         Vector3 dir;
 
@@ -26,7 +22,15 @@ namespace FlyJam
             if (walker == null && GameContext.Current != null) walker = GameContext.Current.Player;
         }
 
-        void OnDisable() => Finish();
+        void OnEnable() => GameEvents.WarningChanged += OnWarning;
+
+        void OnDisable()
+        {
+            GameEvents.WarningChanged -= OnWarning;
+            Finish();
+        }
+
+        void OnWarning(IMovingObstacle t) => threat = t;
 
         void Update()
         {
@@ -34,35 +38,43 @@ namespace FlyJam
             if (cd > 0f) cd -= Time.deltaTime;
             if (timer > 0f) { Tick(); return; }
 
-            if (cd > 0f || !walker.InputEnabled || walker.Input == null || walker.IsOverridden) return;
+            if (!HasThreat() || cd > 0f || TimeControl.InputBlocked) return;
+            if (!walker.InputEnabled || walker.Input == null || walker.IsOverridden) return;
             if (walker.State == FlyState.Celebrating || walker.State == FlyState.Disabled) return;
             if (!walker.Input.ReadDodge()) return;
 
-            Begin(Vector2.ClampMagnitude(walker.Input.ReadMove(), 1f));
+            Begin(InputCompat.Steer());
         }
 
-        void Begin(Vector2 raw)
+        bool HasThreat() => threat != null && !(threat is Object uo && uo == null);
+
+        void Begin(float steer)
         {
             Transform t = walker.transform;
             Vector3 up = walker.Planet.UpAt(t.position);
             Vector3 fwd = Vector3.ProjectOnPlane(t.forward, up).normalized;
             Vector3 right = Vector3.Cross(up, fwd);
+            float dead = balance != null ? balance.SteerDeadZone : 0.3f;
 
-            if (Mathf.Abs(raw.x) > inputDeadZone)
+            if (Mathf.Abs(steer) > dead)
             {
-                dir = right * Mathf.Sign(raw.x);
-                yawSign = Mathf.Sign(raw.x);
+                dir = right * Mathf.Sign(steer);
+                yawSign = Mathf.Sign(steer);
             }
-            else if (raw.y < -inputDeadZone) { dir = -fwd; yawSign = 0f; }
-            else if (raw.y > inputDeadZone) { dir = fwd; yawSign = 0f; }
+            else if (balance != null && balance.NeutralMode == 1)
+            {
+                Vector3 along = Vector3.ProjectOnPlane(threat.Direction, up);
+                dir = along.sqrMagnitude > 1e-6f ? along.normalized : right;
+                yawSign = 0f;
+            }
             else
             {
-                dir = SidestepFromThreat(t.position, up, right);
+                dir = AsideFromPath(t.position, up, right);
                 yawSign = Mathf.Sign(Vector3.Dot(dir, right));
             }
 
-            timer = duration;
-            cd = cooldown;
+            timer = Duration;
+            cd = balance != null ? balance.Cooldown : 0.4f;
             walker.BeginOverride(this);
             walker.SetInvulnerable(this, true);
             walker.SetState(FlyState.Dodging);
@@ -70,15 +82,18 @@ namespace FlyJam
             Tick();
         }
 
+        float Duration => balance != null ? balance.Duration : 0.22f;
+
         void Tick()
         {
             float dt = Time.deltaTime;
-            float spd = distance / duration;
+            float spd = (balance != null ? balance.Distance : 2.2f) / Duration;
             walker.MoveBy(dir * spd * dt);
             walker.AlignToSurface();
             Vector3 up = walker.Planet.UpAt(walker.transform.position);
             dir = Vector3.ProjectOnPlane(dir, up).normalized;
-            if (yawSign != 0f) walker.TurnAround(yawSign * yawKick * dt / duration);
+            float kick = balance != null ? balance.YawKick : 25f;
+            if (yawSign != 0f) walker.TurnAround(yawSign * kick * dt / Duration);
             walker.SetMotion(spd, spd);
 
             timer -= dt;
@@ -94,26 +109,13 @@ namespace FlyJam
             if (walker.State == FlyState.Dodging) walker.SetState(FlyState.Stopped);
         }
 
-        Vector3 SidestepFromThreat(Vector3 pos, Vector3 up, Vector3 fallbackRight)
+        /// Sideways, away from the line the enemy is travelling on.
+        Vector3 AsideFromPath(Vector3 pos, Vector3 up, Vector3 fallbackRight)
         {
-            IMovingObstacle nearest = null;
-            float best = threatSearchRadius;
-            var all = ObstacleRegistry.All;
-            for (int i = 0; i < all.Count; i++)
-            {
-                if (!(all[i] is IMovingObstacle m)) continue;
-                if (all[i] is Object uo && uo == null) continue;
-                float d = Vector3.Distance(m.Position, pos);
-                if (d < best) { best = d; nearest = m; }
-            }
-            if (nearest != null)
-            {
-                Vector3 side = Vector3.Cross(up, nearest.Direction);
-                if (Vector3.Dot(side, pos - nearest.Position) < 0f) side = -side;
-                side = Vector3.ProjectOnPlane(side, up);
-                if (side.sqrMagnitude > 1e-6f) return side.normalized;
-            }
-            return fallbackRight;
+            Vector3 side = Vector3.Cross(up, threat.Direction);
+            if (Vector3.Dot(side, pos - threat.Position) < 0f) side = -side;
+            side = Vector3.ProjectOnPlane(side, up);
+            return side.sqrMagnitude > 1e-6f ? side.normalized : fallbackRight;
         }
     }
 }

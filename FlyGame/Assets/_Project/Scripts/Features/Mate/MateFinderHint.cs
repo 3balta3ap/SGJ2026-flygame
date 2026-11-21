@@ -3,7 +3,8 @@ using UnityEngine.UI;
 
 namespace FlyJam
 {
-    /// Displays a heart indicator toward the mate when the player stops moving.
+    /// Discovery mark (A03, C03): a heart above the female's head while she is on screen and not too far.
+    /// (Class name kept from the prototype's direction hint so the SYS_Mate prefab link survives.)
     public class MateFinderHint : MonoBehaviour
     {
         [SerializeField] Camera worldCamera;        // Auto-filled from GameContext if null
@@ -11,11 +12,11 @@ namespace FlyJam
         [SerializeField] Transform mate;            // Auto-filled from MateAI.Current if null
         [SerializeField] GameSession session;       // Auto-filled from GameContext if null
         [SerializeField] RawImage icon;
-        [SerializeField] float showDelay = 0.35f;
-        [SerializeField] float fadeSpeed = 6f;
-        [SerializeField] float edgeMargin = 0.06f;
-        [SerializeField] Vector2 sizeNearFar = new Vector2(64f, 36f);
-        [SerializeField] Vector2 distanceNearFar = new Vector2(3f, 20f);
+        [SerializeField] float headHeight = 0.9f;
+        [SerializeField] float maxDistance = 16f;
+        [SerializeField] float size = 44f;
+        [SerializeField] float bobPixels = 6f;
+        [SerializeField] float fadeSpeed = 8f;
 
         float alpha;
 
@@ -44,29 +45,18 @@ namespace FlyJam
                 return;
             }
 
-            bool want = !session.Ended && !session.IsPaused
-                        && player.State == FlyState.Stopped && player.TimeInState >= showDelay;
+            Vector3 up = player.Planet.UpAt(mate.position);
+            Vector3 vp = worldCamera.WorldToViewportPoint(mate.position + up * headHeight);
+            bool onScreen = vp.z > 0f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f;
+            bool near = Vector3.Distance(player.transform.position, mate.position) <= maxDistance;
+            bool want = onScreen && near && !session.Ended;
+
             alpha = Mathf.MoveTowards(alpha, want ? 1f : 0f, fadeSpeed * Time.unscaledDeltaTime);
             SetAlpha(alpha);
             if (alpha <= 0f) return;
 
-            Vector3 up = player.Planet.UpAt(mate.position);
-            Vector3 vp = worldCamera.WorldToViewportPoint(mate.position + up * 0.6f);
-            Vector2 p = new Vector2(vp.x - 0.5f, vp.y - 0.5f);
-            if (vp.z < 0f) p = -p;
-
-            float limit = 0.5f - edgeMargin;
-            bool inside = vp.z > 0f && Mathf.Abs(p.x) <= limit && Mathf.Abs(p.y) <= limit;
-            if (!inside)
-            {
-                float m = Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y));
-                p = m < 1e-4f ? new Vector2(0f, -limit) : p / m * limit;
-            }
-            icon.rectTransform.position = new Vector3((p.x + 0.5f) * Screen.width, (p.y + 0.5f) * Screen.height, 0f);
-
-            float dist = Vector3.Distance(player.transform.position, mate.position);
-            float size = Mathf.Lerp(sizeNearFar.x, sizeNearFar.y, Mathf.InverseLerp(distanceNearFar.x, distanceNearFar.y, dist));
-            size *= 1f + 0.12f * Mathf.Sin(Time.unscaledTime * 8f);
+            float bob = Mathf.Sin(Time.unscaledTime * 5f) * bobPixels;
+            icon.rectTransform.position = new Vector3(vp.x * Screen.width, vp.y * Screen.height + bob, 0f);
             icon.rectTransform.sizeDelta = new Vector2(size, size * 6f / 7f);
         }
 

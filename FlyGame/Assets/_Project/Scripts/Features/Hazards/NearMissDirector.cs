@@ -3,37 +3,44 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Triggers slow-motion and a "SPACE!" prompt when a rolling obstacle gets close; dodging in time awards PERFECT.
+    /// Danger warning and dodge result (E01, E02, A04).
+    /// Warning = the nearest enemy that is heading at the player within warnRadius. While warned:
+    /// red frame on the screen edges, "Ⓐボタンで回避！" prompt, slow motion, and dodging is allowed (DodgeAbility listens to WarningChanged).
+    /// Success = after a dodge, that enemy leaves the danger range without touching the player -> "回避!" once.
+    /// (Class name kept from the prototype so the SYS_Hazards prefab link survives.)
     public class NearMissDirector : MonoBehaviour
     {
-        public const string PerfectKey = "dodge.perfect";
+        public const string PerfectKey = "dodge.perfect";   // result stat: number of successful dodges
 
-        [SerializeField] SphereWalker player;      // Auto-filled from GameContext if null
-        [SerializeField] GameSession session;      // Auto-filled from GameContext if null
-        [SerializeField] GameObject promptUI;      // "SPACE!"
-        [SerializeField] TMP_Text perfectText;     // "PERFECT!"
-        [SerializeField] float triggerDistance = 1.8f;
-        [SerializeField] float slowScale = 0.3f;
-        [SerializeField] float windowRealtime = 0.5f;
-        [SerializeField] float cooldown = 4f;
+        [SerializeField] HazardBalance balance;
+        [SerializeField] SphereWalker player;        // Auto-filled from GameContext if null
+        [SerializeField] GameSession session;        // Auto-filled from GameContext if null
+        [SerializeField] GameObject promptUI;        // top centre prompt root
+        [SerializeField] TMP_Text promptText;        // "Ⓐボタンで回避！" (set from code: button name follows the device)
+        [SerializeField] GameObject frameUI;         // red frame on the four screen edges
+        [SerializeField] TMP_Text perfectText;       // "回避!" after a successful dodge
+        [SerializeField] float successShowSeconds = 0.8f;
 
-        float cd, windowEnd, perfectUntil;
-        bool inWindow;
+        RollingObstacle target, dodged;
+        float dodgedTimer, perfectUntil;
 
         public int PerfectCount { get; private set; }
+        public RollingObstacle Target => target;
 
         void OnEnable()
         {
             GameEvents.PlayerDodged += OnDodged;
+            GameEvents.PlayerHitBy += OnHitBy;
             GameEvents.RoundEnded += OnRoundEnded;
         }
 
         void OnDisable()
         {
             GameEvents.PlayerDodged -= OnDodged;
+            GameEvents.PlayerHitBy -= OnHitBy;
             GameEvents.RoundEnded -= OnRoundEnded;
-            Time.timeScale = 1f;
-            Time.fixedDeltaTime = 0.02f;
+            SetTarget(null);
+            TimeControl.SetSlow(this, 1f);
         }
 
         void Start()
@@ -45,59 +52,90 @@ namespace FlyJam
                 if (session == null) session = ctx.Session;
             }
             if (promptUI != null) promptUI.SetActive(false);
+            if (frameUI != null) frameUI.SetActive(false);
             if (perfectText != null) perfectText.enabled = false;
         }
 
         void Update()
         {
-            if (player == null || session == null) return;
-            if (cd > 0f) cd -= Time.unscaledDeltaTime;
+            bool live = player != null && session != null && balance != null && !session.Ended && !session.IsPaused
+                        && player.InputEnabled && player.State != FlyState.Disabled;
 
-            if (inWindow && (Time.unscaledTime >= windowEnd || session.Ended || session.IsPaused))
-                CloseWindow();
+            var next = live ? FindThreat() : null;
+            if (next != target) SetTarget(next);
+            if (target != null && promptText != null)
+                promptText.text = Loc.Format("hazard.prompt", InputCompat.ActionLabel);
 
-            if (!inWindow && cd <= 0f && !session.Ended && !session.IsPaused && player.State != FlyState.Dodging)
-            {
-                var all = RollingObstacle.Active;
-                for (int i = 0; i < all.Count; i++)
-                {
-                    Vector3 to = player.transform.position - all[i].Position;
-                    if (to.magnitude < triggerDistance && Vector3.Dot(all[i].Direction, to.normalized) > 0.6f)
-                    {
-                        OpenWindow();
-                        break;
-                    }
-                }
-            }
-
+            if (live) UpdateSuccess();
             if (perfectText != null) perfectText.enabled = Time.unscaledTime < perfectUntil;
         }
 
-        void OpenWindow()
+        RollingObstacle FindThreat()
         {
-            inWindow = true;
-            windowEnd = Time.unscaledTime + windowRealtime;
-            Time.timeScale = slowScale;
-            Time.fixedDeltaTime = 0.02f * slowScale;
-            if (promptUI != null) promptUI.SetActive(true);
+            RollingObstacle best = null;
+            float bestDist = balance.WarnRadius;
+            var all = RollingObstacle.Active;
+            for (int i = 0; i < all.Count; i++)
+            {
+                var o = all[i];
+                if (o == null || !o.Warns) continue;
+                float d = Vector3.Distance(player.transform.position, o.Position);
+                if (d > bestDist || !Approaching(o)) continue;
+                best = o;
+                bestDist = d;
+            }
+            return best;
         }
 
-        void CloseWindow()
+        bool Approaching(RollingObstacle o)
         {
-            inWindow = false;
-            cd = cooldown;
-            Time.timeScale = 1f;
-            Time.fixedDeltaTime = 0.02f;
-            if (promptUI != null) promptUI.SetActive(false);
+            Vector3 to = player.transform.position - o.Position;
+            return to.sqrMagnitude > 1e-6f && Vector3.Dot(o.Direction, to.normalized) > balance.WarnApproachDot;
+        }
+
+        bool InDanger(RollingObstacle o)
+        {
+            if (o == null) return false;
+            bool activeNow = false;
+            var all = RollingObstacle.Active;
+            for (int i = 0; i < all.Count; i++) if (all[i] == o) { activeNow = true; break; }
+            return activeNow && Vector3.Distance(player.transform.position, o.Position) <= balance.WarnRadius && Approaching(o);
+        }
+
+        void SetTarget(RollingObstacle t)
+        {
+            target = t;
+            GameEvents.RaiseWarningChanged(t);
+            if (promptUI != null) promptUI.SetActive(t != null);
+            if (frameUI != null) frameUI.SetActive(t != null);
+            TimeControl.SetSlow(this, t != null && balance != null ? balance.SlowScale : 1f);
         }
 
         void OnDodged(Vector3 pos, Vector3 dir)
         {
-            if (!inWindow) return;
-            PerfectCount++;
-            perfectUntil = Time.unscaledTime + 0.8f;
-            GameEvents.RaisePerfectDodge();
-            CloseWindow();
+            if (target == null) return;
+            dodged = target;
+            dodgedTimer = balance != null ? balance.SuccessTimeout : 3f;
+        }
+
+        void OnHitBy(IObstacle src)
+        {
+            if (dodged != null && ReferenceEquals(src, dodged)) dodged = null;   // touched it: no success
+        }
+
+        void UpdateSuccess()
+        {
+            if (dodged == null) return;
+            dodgedTimer -= Time.deltaTime;
+            if (!InDanger(dodged))
+            {
+                dodged = null;
+                PerfectCount++;
+                perfectUntil = Time.unscaledTime + successShowSeconds;
+                GameEvents.RaiseDodgeSucceeded();
+                GameEvents.RaisePerfectDodge();   // existing FX burst
+            }
+            else if (dodgedTimer <= 0f) dodged = null;
         }
 
         void OnRoundEnded(bool cleared) => SessionResult.SetStat(PerfectKey, PerfectCount);

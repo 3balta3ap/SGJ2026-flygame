@@ -1,28 +1,35 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace FlyJam
 {
-    /// Core round lifecycle only: clock, pause, end state, and transition to the Result scene.
-    /// The round ends when a feature calls End (e.g., courtship -> "Love") or on GameEvents.PlayerDied.
-    /// There is no time-up: 'dayLength' only drives Normalized (sky colour, hazard difficulty).
+    /// Core round lifecycle only: clock, pause holders, end state.
+    /// The round ends when a feature calls End (courtship -> "Love") or on GameEvents.PlayerDied ("Hit" / "Starved").
+    /// No scene change here: the result panel (UI) listens to RoundEnded.
     public class GameSession : MonoBehaviour
     {
         [SerializeField] SphereWalker player;          // Auto-filled from GameContext if null
-        [Tooltip("Seconds for Normalized to go 0 -> 1 (sky, difficulty). Does not end the round.")]
+        [SerializeField] SessionBalance balance;
+        [Tooltip("Used only when 'balance' is empty")]
         [FormerlySerializedAs("timeLimit")]
         [SerializeField] float dayLength = 45f;
+        [Tooltip("Used only when 'balance' is empty")]
         [SerializeField] float resultDelay = 2.0f;
 
         readonly HashSet<object> pausers = new HashSet<object>();
 
         public float Elapsed { get; private set; }
-        public float Remaining => Mathf.Max(0f, dayLength - Elapsed);
-        public float Normalized => Mathf.Clamp01(Elapsed / dayLength);
+        public float DayLength => balance != null ? balance.DayLength : Mathf.Max(5f, dayLength);
+        public float ResultDelay => balance != null ? balance.ResultDelay : resultDelay;
+        public float Remaining => Mathf.Max(0f, DayLength - Elapsed);
+        /// 0 -> 1 over the first day, then stays 1.
+        public float Normalized => Mathf.Clamp01(Elapsed / DayLength);
+        /// 0 -> 1 every day, repeating (sky colour).
+        public float DayProgress => Mathf.Repeat(Elapsed / DayLength, 1f);
         public bool Ended { get; private set; }
-        /// True while any system holds a pause (e.g., courtship sequence). Freezes clock, sky progression, hazard spawning and HP.
+        /// True while anything holds a pause: courtship, mash battle, pause menu.
+        /// Freezes the clock, sky, enemies, apples and HP.
         public bool IsPaused => pausers.Count > 0;
         public SphereWalker Player => player;
 
@@ -36,7 +43,7 @@ namespace FlyJam
 
         void Start()
         {
-            Time.timeScale = 1f;
+            TimeControl.ResetAll();
             GameEvents.RaiseRoundStarted();
         }
 
@@ -62,7 +69,7 @@ namespace FlyJam
             End(false, string.IsNullOrEmpty(reason) ? "Hit" : reason);
         }
 
-        /// Ends the round. 'reason' selects the result screen title (text key "result.<reason lower case>").
+        /// Ends the round once. 'reason' picks the result title (text key "result.<reason lower case>").
         public void End(bool cleared, string reason)
         {
             if (Ended) return;
@@ -75,14 +82,7 @@ namespace FlyJam
             }
 
             SessionResult.Begin(cleared, Elapsed, reason);
-            GameEvents.RaiseRoundEnded(cleared);   // Each feature records its own stats to SessionResult here
-            StartCoroutine(GoToResultAfterDelay());
-        }
-
-        IEnumerator GoToResultAfterDelay()
-        {
-            yield return new WaitForSeconds(resultDelay);
-            SceneFlow.GoToResult();
+            GameEvents.RaiseRoundEnded(cleared);   // features record stats here; ResultPanel shows after ResultDelay
         }
     }
 }

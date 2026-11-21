@@ -8,9 +8,10 @@ namespace FlyJam
     /// Core fly state. Fixed contract - features must not add values without coordinating with Core.
     public enum FlyState { Stopped, Walking, Dodging, Celebrating, Disabled }
 
-    /// Tank  = Player: input y = forward(+)/backward(-), x = turn in place
-    /// Steer = Mate (AI): input (x, y) = desired local movement direction; body turns toward it
-    public enum MoveMode { Tank, Steer }
+    /// AutoRun = Player: always moves forward, input x steers (arc turns). Stops only while input is disabled (events, end).
+    /// Tank    = old player mode: input y = forward/backward, x = turn in place.
+    /// Steer   = Mate (AI): input (x, y) = desired local movement direction; body turns toward it.
+    public enum MoveMode { Tank, Steer, AutoRun }
 
     /// Spherical surface locomotion. Abilities like Dodge temporarily take control via BeginOverride.
     public class SphereWalker : MonoBehaviour
@@ -18,6 +19,8 @@ namespace FlyJam
         [SerializeField] Planet planet;                     // Auto-filled from GameContext if null
         [SerializeField] MoveMode moveMode = MoveMode.Tank;
         [SerializeField] bool isPlayer = true;
+        [Tooltip("Player: leave empty to use the values below. With a balance asset, maxSpeed/turnRate come from the sheet")]
+        [SerializeField] PlayerMoveBalance balance;
         [SerializeField] float moveSpeed = 4f;
         [SerializeField] float backwardSpeedRatio = 0.7f;
         [SerializeField] float tankTurnSpeed = 150f;
@@ -31,12 +34,15 @@ namespace FlyJam
         public bool IsPlayer => isPlayer;
         public IMoveInput Input => input;
         public bool InputEnabled => inputEnabled;
+        public MoveMode Mode => moveMode;
         public FlyState State { get; private set; } = FlyState.Stopped;
         public float TimeInState { get; private set; }
         public float CurrentSpeed { get; private set; }
         public float SignedSpeed { get; private set; }
-        /// Base move speed before SpeedMultiplier (enemies use it as "player max speed").
-        public float MoveSpeed => moveSpeed;
+        /// Speed before SpeedMultiplier (= "player max speed" for enemies and the female).
+        public float MoveSpeed => balance != null ? balance.MaxSpeed : moveSpeed;
+        /// AutoRun turn speed at full tilt (degrees per second).
+        public float TurnRate => balance != null ? balance.TurnRate : tankTurnSpeed;
         public float SpeedMultiplier { get; set; } = 1f;
         /// Whether an ability currently overrides movement (e.g., Dodge).
         public bool IsOverridden => overrides.Count > 0;
@@ -72,11 +78,36 @@ namespace FlyJam
             bool canControl = inputEnabled && input != null;
             Vector2 raw = canControl ? Vector2.ClampMagnitude(input.ReadMove(), 1f) : Vector2.zero;
 
-            if (moveMode == MoveMode.Tank) UpdateTank(raw, up);
+            if (moveMode == MoveMode.AutoRun) UpdateAutoRun(raw, canControl, up);
+            else if (moveMode == MoveMode.Tank) UpdateTank(raw, up);
             else UpdateSteer(raw, up);
 
             if (State == FlyState.Stopped || State == FlyState.Walking)
                 SetState(Mathf.Abs(SignedSpeed) > 0.01f ? FlyState.Walking : FlyState.Stopped);
+        }
+
+        /// P01: always forward; x steers with a capped turn rate, so turns become wide arcs. Neutral = straight.
+        void UpdateAutoRun(Vector2 raw, bool canControl, Vector3 up)
+        {
+            if (!canControl)
+            {
+                CurrentSpeed = 0f;
+                SignedSpeed = 0f;
+                AlignToSurface();
+                return;
+            }
+
+            float dead = balance != null ? balance.SteerDeadZone : inputDeadZone;
+            float steer = Mathf.Abs(raw.x) > dead ? raw.x : 0f;
+            if (steer != 0f) TurnAround(steer * TurnRate * Time.deltaTime);
+
+            float speed = MoveSpeed * SpeedMultiplier;
+            Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
+            MoveBy(fwd * speed * Time.deltaTime);
+            AlignToSurface();
+
+            CurrentSpeed = speed;
+            SignedSpeed = speed;
         }
 
         void UpdateTank(Vector2 raw, Vector3 up)
@@ -86,7 +117,7 @@ namespace FlyJam
 
             if (turn != 0f) TurnAround(turn * tankTurnSpeed * Time.deltaTime);
 
-            float speed = drive * moveSpeed * (drive < 0f ? backwardSpeedRatio : 1f) * SpeedMultiplier;
+            float speed = drive * MoveSpeed * (drive < 0f ? backwardSpeedRatio : 1f) * SpeedMultiplier;
             if (speed != 0f)
             {
                 Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
@@ -108,8 +139,8 @@ namespace FlyJam
                 move = fwd * raw.y + right * raw.x;
             }
 
-            CurrentSpeed = move.magnitude * moveSpeed * SpeedMultiplier;
-            if (CurrentSpeed > 0f) MoveBy(move * moveSpeed * SpeedMultiplier * Time.deltaTime);
+            CurrentSpeed = move.magnitude * MoveSpeed * SpeedMultiplier;
+            if (CurrentSpeed > 0f) MoveBy(move * MoveSpeed * SpeedMultiplier * Time.deltaTime);
             AlignToSurface();
             if (CurrentSpeed > 0f) TurnToward(move, steerTurnSpeed);
             SignedSpeed = CurrentSpeed;

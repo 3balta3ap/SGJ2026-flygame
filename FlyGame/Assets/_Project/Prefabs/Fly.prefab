@@ -215,9 +215,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.SphereWalker
   planet: {fileID: 0}
-  moveMode: 0
+  moveMode: 2
   isPlayer: 1
-  moveSpeed: 4
+  balance: {fileID: 11400000, guid: 04ef71e149dbc466788d63cd8cd7204f, type: 2}
+  moveSpeed: 6
   backwardSpeedRatio: 0.5
   tankTurnSpeed: 150
   turnAnimSpeed: 1.5
@@ -225,11 +226,6 @@ MonoBehaviour:
   inputDeadZone: 0.1
   surfaceOffset: 0
   bodyRadius: 0.3
-  dodgeDistance: 2.2
-  dodgeDuration: 0.22
-  dodgeCooldown: 0.7
-  dodgeYawKick: 25
-  threatSearchRadius: 6
 --- !u!114 &1292903233601169717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,6 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.ObstacleHitDetector
   walker: {fileID: 5369702876211011111}
   selfRadius: 0.3
+  rehitDelay: 0.5
 --- !u!114 &7662237562141047476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2199,7 +2196,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.FlyVisual
   walker: {fileID: 5369702876211011111}
-  facing: {fileID: 0}
   bodyRoot: {fileID: 3515705835176614301}
   legs:
   - {fileID: 219731140816984841}

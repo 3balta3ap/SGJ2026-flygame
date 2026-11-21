@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FlyJam
 {
-    /// Spawns enemies around the player: random direction, 35-60 degrees away, aimed near the player.
-    /// Which enemy = weighted pick from HazardBalance "HazardTypes" rows. Each row id needs a prefab in 'prefabs'.
+    /// Keeps a fixed population of enemies circling the planet (C04-C08).
+    /// After firstDelay, one enemy appears every spawnInterval until each HazardTypes row reaches its 'count'.
+    /// Each one starts 50-170 degrees away from the player with a random heading and never disappears.
     public class ObstacleSpawner : MonoBehaviour
     {
         [System.Serializable]
@@ -31,11 +31,11 @@ namespace FlyJam
                 if (player == null) player = ctx.Player;
                 if (session == null) session = ctx.Session;
             }
-            timer = balance != null ? balance.FirstDelay : 3f;
+            timer = balance != null ? balance.FirstDelay : 2f;
 
             if (balance != null)
                 foreach (var t in balance.Types)
-                    if (t.weight > 0f && FindPrefab(t.id) == null)
+                    if (t.count > 0 && FindPrefab(t.id) == null)
                         Debug.LogWarning($"[ObstacleSpawner] no prefab for enemy type '{t.id}' - it will not spawn");
         }
 
@@ -45,14 +45,43 @@ namespace FlyJam
             if (session.Ended || session.IsPaused) return;
             timer -= Time.deltaTime;
             if (timer > 0f) return;
-            timer = Mathf.Lerp(balance.IntervalStart, balance.IntervalEnd, session.Normalized);
-            if (RollingObstacle.Alive.Count < balance.MaxActive) Spawn();
+            timer = balance.SpawnInterval;
+
+            if (PickShortType(out var row, out var prefab)) Spawn(row, prefab);
         }
 
-        void Spawn()
+        /// The type with the biggest shortage (count - alive). False when every type is full.
+        bool PickShortType(out HazardBalance.TypeRow row, out RollingObstacle prefab)
         {
-            if (!PickType(out var row, out var prefab)) return;
+            row = default;
+            prefab = null;
+            int best = 0;
+            foreach (var t in balance.Types)
+            {
+                var p = FindPrefab(t.id);
+                if (p == null || t.count <= 0) continue;
+                int shortage = t.count - AliveOf(t.id);
+                if (shortage > best)
+                {
+                    best = shortage;
+                    row = t;
+                    prefab = p;
+                }
+            }
+            return prefab != null;
+        }
 
+        static int AliveOf(string id)
+        {
+            int n = 0;
+            var all = RollingObstacle.Alive;
+            for (int i = 0; i < all.Count; i++)
+                if (all[i] != null && string.Equals(all[i].TypeId, id, System.StringComparison.OrdinalIgnoreCase)) n++;
+            return n;
+        }
+
+        void Spawn(HazardBalance.TypeRow row, RollingObstacle prefab)
+        {
             Vector3 up = planet.UpAt(player.transform.position);
             Vector3 baseFwd = Vector3.ProjectOnPlane(player.transform.forward, up).normalized;
             Vector3 tangent = Quaternion.AngleAxis(Random.Range(0f, 360f), up) * baseFwd;
@@ -61,35 +90,11 @@ namespace FlyJam
 
             Vector3 spawnPos = planet.SurfacePoint(spawnDir);
             Vector3 sUp = planet.UpAt(spawnPos);
-            Vector3 toPlayer = Vector3.ProjectOnPlane(player.transform.position - spawnPos, sUp).normalized;
-            toPlayer = Quaternion.AngleAxis(Random.Range(-balance.AimJitter, balance.AimJitter), sUp) * toPlayer;
+            Vector3 anyTangent = Vector3.ProjectOnPlane(Mathf.Abs(sUp.y) < 0.9f ? Vector3.up : Vector3.forward, sUp).normalized;
+            Vector3 heading = Quaternion.AngleAxis(Random.Range(0f, 360f), sUp) * anyTangent;
 
             var o = Instantiate(prefab);
-            float speed = player.MoveSpeed * row.speedRatio;
-            float travel = planet.Radius * Mathf.PI * balance.TravelRatio;
-            o.Launch(planet, spawnPos, toPlayer, speed, travel, row, player.transform);
-        }
-
-        bool PickType(out HazardBalance.TypeRow row, out RollingObstacle prefab)
-        {
-            row = default;
-            prefab = null;
-            float total = 0f;
-            foreach (var t in balance.Types)
-                if (t.weight > 0f && FindPrefab(t.id) != null) total += t.weight;
-            if (total <= 0f) return false;
-
-            float r = Random.Range(0f, total);
-            foreach (var t in balance.Types)
-            {
-                var p = t.weight > 0f ? FindPrefab(t.id) : null;
-                if (p == null) continue;
-                row = t;
-                prefab = p;
-                r -= t.weight;
-                if (r <= 0f) break;
-            }
-            return prefab != null;
+            o.Launch(planet, spawnPos, heading, player.MoveSpeed * row.speedRatio, 0f, row, player.transform);
         }
 
         RollingObstacle FindPrefab(string id)

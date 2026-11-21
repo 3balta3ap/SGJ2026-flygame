@@ -2,27 +2,44 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Raises MateTouched when the player reaches the mate (counts even while invisible).
+    /// Raises MateTouched when the player reaches the female.
+    /// After a courtship ends (Rearm), the player must first move rearmDistance away: no automatic restart (E03, E04).
     public class MateGoal : MonoBehaviour
     {
         [SerializeField] Transform player;
         [SerializeField] float reachDistance = 0.9f;
-        [SerializeField] float retryCooldown = 2f;
+        [SerializeField] float rearmDistance = 2.5f;
 
-        float cooldown;
         bool armed = true;
+        bool waitForSeparation;
+        GameSession session;
 
         void Awake()
         {
-            if (player == null && GameContext.Current != null && GameContext.Current.Player != null)
-                player = GameContext.Current.Player.transform;
+            var ctx = GameContext.Current;
+            if (ctx != null)
+            {
+                if (player == null && ctx.Player != null) player = ctx.Player.transform;
+                session = ctx.Session;
+            }
         }
 
         void Update()
         {
-            if (cooldown > 0f) { cooldown -= Time.deltaTime; return; }
-            if (!armed || player == null) return;
-            if (Vector3.Distance(player.position, transform.position) <= reachDistance)
+            if (player == null) return;
+            if (session != null && (session.Ended || session.IsPaused)) return;
+
+            float d = Vector3.Distance(player.position, transform.position);
+            if (waitForSeparation)
+            {
+                if (d > rearmDistance)
+                {
+                    waitForSeparation = false;
+                    armed = true;
+                }
+                return;
+            }
+            if (armed && d <= reachDistance)
             {
                 armed = false;
                 GameEvents.RaiseMateTouched();
@@ -31,8 +48,8 @@ namespace FlyJam
 
         public void Rearm()
         {
-            cooldown = retryCooldown;
-            armed = true;
+            armed = false;
+            waitForSeparation = true;
         }
     }
 }

@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b420509c8479041e2b054819331b4cad, type: 3}
   m_Name: HealthBalance
   m_EditorClassIdentifier: FlyJam.Health::FlyJam.HealthBalance
-  maxHp: 100
-  drainPerSecond: 1.5
-  obstacleDamage: 30
+  maxHp: 10
+  startHp: 5
+  drainPerSecond: 0.1
+  obstacleDamageRatio: 0.2
+  minSpeedRatio: 0.3
   invulnerableTime: 1.5
   blinkInterval: 0.08
   lowHpRatio: 0.3

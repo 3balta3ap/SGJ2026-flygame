@@ -12,42 +12,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98f53c26fcd234682bc62f306d87abf7, type: 3}
   m_Name: HazardBalance
   m_EditorClassIdentifier: FlyJam.Hazards::FlyJam.HazardBalance
-  firstDelay: 3
-  intervalStart: 3.5
-  intervalEnd: 1.4
-  maxActive: 6
-  spawnAngleMin: 35
-  spawnAngleMax: 60
-  aimJitter: 15
-  travelRatio: 0.6
+  firstDelay: 2
+  spawnInterval: 1.5
+  spawnAngleMin: 50
+  spawnAngleMax: 170
+  warnRadius: 3
+  warnApproachDot: 0.5
+  slowScale: 0.5
+  successTimeout: 3
   types:
   - id: dragonfly
-    weight: 0
+    count: 2
     speedRatio: 0.7
+    damageRatio: 0.2
+    warn: 1
+    rival: 0
     chase: 0
     detectRadius: 0
     loseRadius: 0
     turnRate: 0
     stopOnHit: 2
   - id: spider
-    weight: 0
+    count: 2
     speedRatio: 0.7
+    damageRatio: 0.2
+    warn: 1
+    rival: 0
     chase: 0
     detectRadius: 0
     loseRadius: 0
     turnRate: 0
     stopOnHit: 2
   - id: male
-    weight: 100
+    count: 1
     speedRatio: 0.7
+    damageRatio: 0
+    warn: 1
+    rival: 1
     chase: 1
     detectRadius: 6
     loseRadius: 9
     turnRate: 120
     stopOnHit: 2
   - id: acorn
-    weight: 0
-    speedRatio: 1
+    count: 1
+    speedRatio: 0.7
+    damageRatio: 0.1
+    warn: 1
+    rival: 0
     chase: 0
     detectRadius: 0
     loseRadius: 0
