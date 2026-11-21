@@ -1,6 +1,6 @@
 <div align="center">
 
-
+<img src="./Screenshot_2026-11-22_00-22-13.png" />
 
 </div>
 
@@ -24,6 +24,12 @@ Pitch: You're Baz 'The Fly' from now! Find your foods and mates to be alive! Wal
 How to play: Touch Pad. Use stick to manipulate the fly!
 
 Visuals: 
+
+<div align="center">
+
+<img src="./sCREENSHOT_2026-11-22_00-21-43.png" />
+
+</div>
 
 Credits: Buzz Studio
 
@@ -56,6 +62,12 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 操作方法：バズ（ハエ）の移動はスティックを使って行います。
 
 ビジュアル・トレーラー：
+
+<div align="center">
+
+<img src="./sCREENSHOT_2026-11-22_00-21-43.png" />
+
+</div>
 
 クレジット：Buzz Studio
 
