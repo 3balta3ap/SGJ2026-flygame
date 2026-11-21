@@ -27,7 +27,7 @@ Visuals:
 
 <div align="center">
 
-<img src="./sCREENSHOT_2026-11-22_00-21-43.png" />
+<img src="./Screenshot_2026-11-22_00-21-43.png" />
 
 </div>
 
@@ -65,7 +65,7 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 
 <div align="center">
 
-<img src="./sCREENSHOT_2026-11-22_00-21-43.png" />
+<img src="./Screenshot_2026-11-22_00-21-43.png" />
 
 </div>
 
