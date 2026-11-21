@@ -1,0 +1,126 @@
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace FlyJam
+{
+    public class DayNightCycle : MonoBehaviour
+    {
+        public static DayNightCycle Current { get; private set; }
+
+        [SerializeField] GameSession session;
+        [SerializeField] float idleCycleSeconds = 20f;
+        [SerializeField] Camera worldCamera;
+        [SerializeField] Planet planet;
+        [SerializeField] Light keyLight;                 // Main Camera 자식 Directional Light (방향만 사용)
+        [SerializeField] Material skyMaterial;
+        [SerializeField] bool useCodeDefaults = true;
+        [SerializeField] Gradient topColor, horizonColor, lightColor, ambientColor;
+        [SerializeField] AnimationCurve lightIntensity;
+        [SerializeField, Range(0.5f, 0.95f)] float nightStart = 35f / 45f;
+
+        [Header("해·달 경로 (카메라가 보는 쪽 하늘 기준, 도) — 시야각 40°용")]
+        [SerializeField] float arcAzimuth = 28f;
+        [SerializeField] float arcLowElevation = -36f;
+        [SerializeField] float arcPeakElevation = -14f;
+
+        [Header("Toon 안개")]
+        [SerializeField] float fogStart = 14f;
+        [SerializeField] float fogEnd = 30f;
+        [SerializeField, Range(0f, 1f)] float fogMax = 0.35f;
+
+        public float T { get; private set; }
+        public float NightFactor { get; private set; }
+
+        Material skyInstance;
+
+        static readonly int KeyDirId = Shader.PropertyToID("_FlyKeyDir");
+        static readonly int TintId = Shader.PropertyToID("_FlyTint");
+        static readonly int ExposureId = Shader.PropertyToID("_FlyExposure");
+        static readonly int CenterId = Shader.PropertyToID("_FlyPlanetCenter");
+        static readonly int FogColorId = Shader.PropertyToID("_FlyFogColor");
+        static readonly int FogRangeId = Shader.PropertyToID("_FlyFogRange");
+
+        void Awake()
+        {
+            Current = this;
+            if (useCodeDefaults || lightIntensity == null || lightIntensity.length == 0) BuildDefaults();
+            skyInstance = new Material(skyMaterial);
+            RenderSettings.skybox = skyInstance;
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            LateUpdate();   // 첫 프레임부터 Toon 전역 값이 채워지도록
+        }
+
+        void OnDestroy()
+        {
+            if (Current == this) Current = null;
+        }
+
+        void LateUpdate()
+        {
+            T = session != null ? session.Normalized : Mathf.Repeat(Time.time / idleCycleSeconds, 1f);
+            NightFactor = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(nightStart - 0.08f, nightStart + 0.04f, T));
+
+            Vector3 up = planet.UpAt(worldCamera.transform.position);
+            Vector3 fwd = Vector3.ProjectOnPlane(worldCamera.transform.forward, up).normalized;
+
+            Vector3 sunDir = Arc(up, fwd, Mathf.InverseLerp(0f, nightStart, T));
+            Vector3 moonDir = Arc(up, fwd, Mathf.InverseLerp(nightStart - 0.05f, 1f, T) * 0.7f);
+
+            Color horizon = horizonColor.Evaluate(T);
+            skyInstance.SetVector("_SkyUp", up);
+            skyInstance.SetColor("_TopColor", topColor.Evaluate(T));
+            skyInstance.SetColor("_HorizonColor", horizon);
+            skyInstance.SetColor("_BottomColor", horizon * 0.85f);
+            skyInstance.SetVector("_SunDir", sunDir);
+            skyInstance.SetVector("_MoonDir", moonDir);
+            skyInstance.SetColor("_SunColor", new Color(1f, 0.92f, 0.75f, 1f - NightFactor));
+            skyInstance.SetColor("_MoonColor", new Color(0.85f, 0.9f, 1f, NightFactor));
+            skyInstance.SetFloat("_StarIntensity", NightFactor);
+
+            Color tint = lightColor.Evaluate(T);
+            float exposure = lightIntensity.Evaluate(T);
+            keyLight.color = tint;
+            keyLight.intensity = exposure;
+            RenderSettings.ambientLight = ambientColor.Evaluate(T);
+
+            // Toon 셰이더 전역 값
+            Shader.SetGlobalVector(KeyDirId, -keyLight.transform.forward);
+            Shader.SetGlobalColor(TintId, tint);
+            Shader.SetGlobalFloat(ExposureId, exposure);
+            Shader.SetGlobalVector(CenterId, planet.Center);
+            Shader.SetGlobalColor(FogColorId, horizon);
+            Shader.SetGlobalVector(FogRangeId, new Vector4(fogStart, fogEnd, fogMax, 0f));
+        }
+
+        Vector3 Arc(Vector3 up, Vector3 fwd, float t)
+        {
+            float az = Mathf.Lerp(arcAzimuth, -arcAzimuth, t);
+            float elev = Mathf.Lerp(arcLowElevation, arcPeakElevation, Mathf.Sin(t * Mathf.PI)) * Mathf.Deg2Rad;
+            Vector3 flat = Quaternion.AngleAxis(az, up) * fwd;
+            return (flat * Mathf.Cos(elev) + up * Mathf.Sin(elev)).normalized;
+        }
+
+        void BuildDefaults()
+        {
+            float[] t = { 0f, 5f / 45f, 25f / 45f, 30f / 45f, nightStart, 1f };
+            topColor = G(t, new[] { C(0.30f, 0.32f, 0.58f), C(0.35f, 0.60f, 0.95f), C(0.35f, 0.60f, 0.95f), C(0.45f, 0.38f, 0.70f), C(0.07f, 0.08f, 0.22f), C(0.03f, 0.04f, 0.12f) });
+            horizonColor = G(t, new[] { C(1.00f, 0.62f, 0.48f), C(0.75f, 0.88f, 1.00f), C(0.75f, 0.88f, 1.00f), C(1.00f, 0.55f, 0.30f), C(0.25f, 0.16f, 0.32f), C(0.07f, 0.08f, 0.20f) });
+            lightColor = G(t, new[] { C(1.00f, 0.72f, 0.55f), C(1.00f, 0.97f, 0.90f), C(1.00f, 0.97f, 0.90f), C(1.00f, 0.62f, 0.38f), C(0.60f, 0.68f, 1.00f), C(0.60f, 0.68f, 1.00f) });
+            ambientColor = G(t, new[] { C(0.45f, 0.40f, 0.45f), C(0.60f, 0.62f, 0.66f), C(0.60f, 0.62f, 0.66f), C(0.55f, 0.42f, 0.40f), C(0.26f, 0.28f, 0.42f), C(0.24f, 0.27f, 0.40f) });
+            lightIntensity = new AnimationCurve(
+                new Keyframe(t[0], 0.46f), new Keyframe(t[1], 0.85f), new Keyframe(t[2], 0.85f),
+                new Keyframe(t[3], 0.62f), new Keyframe(t[4], 0.35f), new Keyframe(t[5], 0.35f));
+        }
+
+        static Color C(float r, float g, float b) => new Color(r, g, b, 1f);
+
+        static Gradient G(float[] times, Color[] colors)
+        {
+            var ck = new GradientColorKey[times.Length];
+            for (int i = 0; i < times.Length; i++) ck[i] = new GradientColorKey(colors[i], times[i]);
+            var g = new Gradient();
+            g.SetKeys(ck, new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) });
+            return g;
+        }
+    }
+}
