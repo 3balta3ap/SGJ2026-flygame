@@ -1,3 +1,4 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -12,16 +13,32 @@ namespace FlyJam
         void Start()
         {
             Time.timeScale = 1f;
-            titleText.text = SessionResult.Cleared ? "LOVE!" : (SessionResult.Reason == "Hit" ? "OUCH!" : "TIME UP");
+            titleText.text = TitleFor(SessionResult.Reason, SessionResult.Cleared);
 
-            string best = SessionResult.BestReaction >= 0f ? $"{SessionResult.BestReaction:0.00}s" : "-";
-            detailText.text =
-                $"Your best dodge reaction: {best}\n" +
-                "Fruit fly (lab data): about 0.2-0.3s\n" +
-                $"PERFECT dodges: {SessionResult.PerfectCount}\n\n" +
-                "SPACE: Retry   ESC: Title";
+            var sb = new StringBuilder();
+            if (SessionResult.TryGetStat("reaction.best", out float best))
+            {
+                sb.AppendLine($"Your best dodge reaction: {best:0.00}s");
+                sb.AppendLine("Fruit fly (lab data): about 0.2-0.3s");
+            }
+            if (SessionResult.TryGetStat("dodge.perfect", out float perfect))
+                sb.AppendLine($"PERFECT dodges: {perfect:0}");
+            sb.AppendLine();
+            sb.Append("SPACE: Retry   ESC: Title");
+            detailText.text = sb.ToString();
 
             if (factText != null) factText.text = FlyFacts.Pick();
+        }
+
+        static string TitleFor(string reason, bool cleared)
+        {
+            switch (reason)
+            {
+                case "Love": return "LOVE!";
+                case "Hit": return "OUCH!";
+                case "TimeUp": return "TIME UP";
+                default: return cleared ? "CLEAR!" : "FAILED";
+            }
         }
 
         void Update()

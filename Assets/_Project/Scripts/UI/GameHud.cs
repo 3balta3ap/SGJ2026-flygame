@@ -8,6 +8,11 @@ namespace FlyJam
         [SerializeField] GameSession session;
         [SerializeField] TMP_Text timerText;
 
+        void Start()
+        {
+            if (session == null && GameContext.Current != null) session = GameContext.Current.Session;
+        }
+
         void Update()
         {
             if (session == null || timerText == null) return;

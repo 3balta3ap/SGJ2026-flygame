@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 5842484118755925035}
   - component: {fileID: 5369702876211011111}
   - component: {fileID: 1292903233601169717}
+  - component: {fileID: 7662237562141047476}
   m_Layer: 0
   m_Name: Fly
   m_TagString: Untagged
@@ -243,6 +244,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.ObstacleHitDetector
   walker: {fileID: 5369702876211011111}
   selfRadius: 0.3
+--- !u!114 &7662237562141047476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842822372463067481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a956cacece274946b89da154cc07924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlyJam.KeepClearZone
+  radius: 3
 --- !u!1 &1912950121087627483
 GameObject:
   m_ObjectHideFlags: 0
@@ -2185,6 +2199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.FlyVisual
   walker: {fileID: 5369702876211011111}
+  facing: {fileID: 0}
   bodyRoot: {fileID: 3515705835176614301}
   legs:
   - {fileID: 219731140816984841}

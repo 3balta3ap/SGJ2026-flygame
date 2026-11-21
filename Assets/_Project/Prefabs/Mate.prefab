@@ -191,6 +191,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 842822372463067481, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2352228946599988279}
+    - targetCorrespondingSourceObject: {fileID: 842822372463067481, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3766304038856996158}
   m_SourcePrefab: {fileID: 100100000, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
 --- !u!1 &1859039328899924183 stripped
 GameObject:
@@ -265,6 +268,20 @@ MonoBehaviour:
   halo: {fileID: 1848494487141533561}
   dayIntensity: 0
   nightIntensity: 1.4
+--- !u!114 &3766304038856996158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859039328899924183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d7d8170e4bf749f0a36f92ca1a01103, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlyJam.ToonifyOnSpawn
+  toonShader: {fileID: 4800000, guid: ec8e81d5593504135b213fc2428991d8, type: 3}
+  layer: 1
 --- !u!4 &1975330311926721595 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 655032278519541173, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
