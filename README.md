@@ -63,7 +63,7 @@ License: This game is licensed under Creative Commons CC-BY-NC 3.0.
 
 Science in this game: What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. To be alive effectively, flies need to avoid its enemies, or its competitors during energy-efficient walking, compared to flying. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
 
-1: [Unpublished] PhD project of Kazuki Nishimura, UTokyo, Japan.
+1: [Unpublished] PhD project of Kazuki Nishimura, Yanagihara Lab, UTokyo, Japan.
 
 ---
 
