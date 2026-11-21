@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+*~
