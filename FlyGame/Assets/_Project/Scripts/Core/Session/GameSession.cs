@@ -1,24 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FlyJam
 {
-    /// Core round lifecycle only: timer, pause, end state, and transition to the Result scene.
-    /// Win conditions (e.g., courtship) are driven by features calling End(true, reason).
+    /// Core round lifecycle only: clock, pause, end state, and transition to the Result scene.
+    /// The round ends when a feature calls End (e.g., courtship -> "Love") or on GameEvents.PlayerDied.
+    /// There is no time-up: 'dayLength' only drives Normalized (sky colour, hazard difficulty).
     public class GameSession : MonoBehaviour
     {
         [SerializeField] SphereWalker player;          // Auto-filled from GameContext if null
-        [SerializeField] float timeLimit = 45f;
+        [Tooltip("Seconds for Normalized to go 0 -> 1 (sky, difficulty). Does not end the round.")]
+        [FormerlySerializedAs("timeLimit")]
+        [SerializeField] float dayLength = 45f;
         [SerializeField] float resultDelay = 2.0f;
 
         readonly HashSet<object> pausers = new HashSet<object>();
 
         public float Elapsed { get; private set; }
-        public float Remaining => Mathf.Max(0f, timeLimit - Elapsed);
-        public float Normalized => Mathf.Clamp01(Elapsed / timeLimit);
+        public float Remaining => Mathf.Max(0f, dayLength - Elapsed);
+        public float Normalized => Mathf.Clamp01(Elapsed / dayLength);
         public bool Ended { get; private set; }
-        /// True while any system holds a pause (e.g., courtship sequence). Freezes timer, sky progression, and hazard spawning.
+        /// True while any system holds a pause (e.g., courtship sequence). Freezes clock, sky progression, hazard spawning and HP.
         public bool IsPaused => pausers.Count > 0;
         public SphereWalker Player => player;
 
@@ -27,8 +31,8 @@ namespace FlyJam
             if (player == null && GameContext.Current != null) player = GameContext.Current.Player;
         }
 
-        void OnEnable() => GameEvents.PlayerHit += OnPlayerHit;
-        void OnDisable() => GameEvents.PlayerHit -= OnPlayerHit;
+        void OnEnable() => GameEvents.PlayerDied += OnPlayerDied;
+        void OnDisable() => GameEvents.PlayerDied -= OnPlayerDied;
 
         void Start()
         {
@@ -40,7 +44,6 @@ namespace FlyJam
         {
             if (Ended || IsPaused) return;
             Elapsed += Time.deltaTime;
-            if (Elapsed >= timeLimit) End(false, "TimeUp");
         }
 
         public void Pause(object by)
@@ -53,13 +56,13 @@ namespace FlyJam
             if (by != null) pausers.Remove(by);
         }
 
-        void OnPlayerHit()
+        void OnPlayerDied(string reason)
         {
-            if (Ended || IsPaused) return;
-            End(false, "Hit");
+            if (Ended) return;
+            End(false, string.IsNullOrEmpty(reason) ? "Hit" : reason);
         }
 
-        /// Ends the round. 'reason' selects the result screen title (e.g., "Love", "Hit", "TimeUp").
+        /// Ends the round. 'reason' selects the result screen title (text key "result.<reason lower case>").
         public void End(bool cleared, string reason)
         {
             if (Ended) return;

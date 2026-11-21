@@ -91,3 +91,9 @@ MonoBehaviour:
   - key: fact.5
     en: A male fruit fly sings a courtship song to the female - sometimes hundreds of times.
     ja: "\u30AA\u30B9\u306E\u30B7\u30E7\u30A6\u30B8\u30E7\u30A6\u30D0\u30A8\u306F\u3001\u30E1\u30B9\u306B\u6C42\u611B\u306E\u6B4C\u3092\u3046\u305F\u3046\u3002\u3068\u304D\u306B\u306F\u4F55\u767E\u56DE\u3082\u3002"
+  - key: hud.hp
+    en: HP
+    ja: HP
+  - key: result.starved
+    en: STARVED
+    ja: "\u306F\u3089\u307A\u3053\u2026"
