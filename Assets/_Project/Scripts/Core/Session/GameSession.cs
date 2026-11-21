@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 한 판의 규칙 중 코어만: 타이머, 일시정지, 종료, 결과 화면 이동.
-    /// 승리 조건(구애 등)은 기능이 End(true, 이유)를 호출해서 만든다.
+    /// Core round lifecycle only: timer, pause, end state, and transition to the Result scene.
+    /// Win conditions (e.g., courtship) are driven by features calling End(true, reason).
     public class GameSession : MonoBehaviour
     {
-        [SerializeField] SphereWalker player;          // 비우면 GameContext에서
+        [SerializeField] SphereWalker player;          // Auto-filled from GameContext if null
         [SerializeField] float timeLimit = 45f;
         [SerializeField] float resultDelay = 2.0f;
 
@@ -18,7 +18,7 @@ namespace FlyJam
         public float Remaining => Mathf.Max(0f, timeLimit - Elapsed);
         public float Normalized => Mathf.Clamp01(Elapsed / timeLimit);
         public bool Ended { get; private set; }
-        /// 누군가 Pause 중이면 true (구애 연출 등). 타이머·하늘·장애물 생성이 멈춘다.
+        /// True while any system holds a pause (e.g., courtship sequence). Freezes timer, sky progression, and hazard spawning.
         public bool IsPaused => pausers.Count > 0;
         public SphereWalker Player => player;
 
@@ -59,7 +59,7 @@ namespace FlyJam
             End(false, "Hit");
         }
 
-        /// 판을 끝낸다. 이유(reason)는 결과 화면 제목에 쓰인다: "Love", "Hit", "TimeUp" 등.
+        /// Ends the round. 'reason' selects the result screen title (e.g., "Love", "Hit", "TimeUp").
         public void End(bool cleared, string reason)
         {
             if (Ended) return;
@@ -72,7 +72,7 @@ namespace FlyJam
             }
 
             SessionResult.Begin(cleared, Elapsed, reason);
-            GameEvents.RaiseRoundEnded(cleared);   // 각 기능이 여기서 자기 통계를 SessionResult에 기록한다
+            GameEvents.RaiseRoundEnded(cleared);   // Each feature records its own stats to SessionResult here
             StartCoroutine(GoToResultAfterDelay());
         }
 

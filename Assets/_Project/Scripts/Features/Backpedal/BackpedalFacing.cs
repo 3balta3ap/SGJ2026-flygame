@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 뒷걸음 중에는 겉모습(FlyVisual이 붙은 Visual)만 180° 돌려 카메라를 보게 한다.
-    /// 몸·이동·카메라는 건드리지 않는다. 코어(FlyVisual)는 이 컴포넌트를 모른다.
+    /// Rotates only the visual (FlyVisual transform) 180 degrees to face the camera while backing up.
+    /// Leaves body root, movement, and camera untouched. Core (FlyVisual) has no knowledge of this component.
     public class BackpedalFacing : MonoBehaviour
     {
-        [SerializeField] SphereWalker walker;     // 비우면 GameContext.Player
-        [SerializeField] FlyVisual flyVisual;     // 비우면 walker 아래에서 찾음
-        [SerializeField] GameSession session;     // 비우면 GameContext에서
+        [SerializeField] SphereWalker walker;     // Auto-filled from GameContext.Player if null
+        [SerializeField] FlyVisual flyVisual;     // Found under walker if null
+        [SerializeField] GameSession session;     // Auto-filled from GameContext if null
         [SerializeField] float turnTime = 0.25f;
 
         public bool FacingCamera { get; private set; }
@@ -51,7 +51,7 @@ namespace FlyJam
                 FacingCamera = false;
             else if (walker.State == FlyState.Walking)
                 FacingCamera = walker.SignedSpeed < 0f;
-            // Stopped, Dodging: 지금 방향 유지
+            // Stopped, Dodging: keep current facing
 
             float target = FacingCamera ? 180f : 0f;
             yaw = Mathf.MoveTowards(yaw, target, 180f / Mathf.Max(0.01f, turnTime) * Time.deltaTime);

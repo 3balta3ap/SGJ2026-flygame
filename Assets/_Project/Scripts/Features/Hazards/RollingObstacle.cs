@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 행성 표면의 큰 원을 따라 굴러가는 장애물. 나무 등은 통과한다 (굴러 넘어가는 것으로 취급).
+    /// Obstacle that rolls along a great circle on the planet surface, passing through props like trees.
     public class RollingObstacle : MonoBehaviour, IMovingObstacle
     {
         static readonly List<RollingObstacle> active = new List<RollingObstacle>();

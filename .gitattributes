@@ -1,7 +1,7 @@
-# 줄바꿈 정규화
+# Line ending normalization
 * text=auto
 
-# 코드
+# Code
 *.cs        text diff=csharp
 *.shader    text
 *.hlsl      text
@@ -10,7 +10,7 @@
 *.json      text
 *.md        text
 
-# Unity YAML (Force Text 직렬화). Smart Merge(UnityYAMLMerge)를 설정한 사람은 자동으로 사용된다.
+# Unity YAML (Force Text serialization). Automatically uses Smart Merge (UnityYAMLMerge) if configured.
 *.unity          text merge=unityyamlmerge eol=lf
 *.prefab         text merge=unityyamlmerge eol=lf
 *.asset          text merge=unityyamlmerge eol=lf
@@ -22,7 +22,7 @@
 *.inputactions   text eol=lf
 *.shadergraph    text eol=lf
 
-# 바이너리 (diff·병합하지 않음)
+# Binary (no diff or merge)
 *.png   binary
 *.jpg   binary
 *.jpeg  binary

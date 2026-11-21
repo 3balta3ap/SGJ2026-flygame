@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 운동맹: 짝이 걷는 동안은 보이지 않고, 멈추면 '팟' 하고 나타난다.
-    /// motionBlind를 끄면 항상 보인다 (팀 앞에서 비교 시연용).
+    /// Motion blindness: mate is invisible while walking and pops into view when stopped.
+    /// Disable motionBlind to keep the mate always visible (for A/B comparison demos).
     public class MotionBlindVisibility : MonoBehaviour
     {
         [SerializeField] SphereWalker walker;

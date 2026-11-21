@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 굴러오는 장애물이 아슬아슬하게 다가오면 슬로모션 + "SPACE!" 표시. 그 사이에 회피하면 PERFECT.
+    /// Triggers slow-motion and a "SPACE!" prompt when a rolling obstacle gets close; dodging in time awards PERFECT.
     public class NearMissDirector : MonoBehaviour
     {
         public const string PerfectKey = "dodge.perfect";
 
-        [SerializeField] SphereWalker player;      // 비우면 GameContext에서
-        [SerializeField] GameSession session;      // 비우면 GameContext에서
+        [SerializeField] SphereWalker player;      // Auto-filled from GameContext if null
+        [SerializeField] GameSession session;      // Auto-filled from GameContext if null
         [SerializeField] GameObject promptUI;      // "SPACE!"
         [SerializeField] TMP_Text perfectText;     // "PERFECT!"
         [SerializeField] float triggerDistance = 1.8f;

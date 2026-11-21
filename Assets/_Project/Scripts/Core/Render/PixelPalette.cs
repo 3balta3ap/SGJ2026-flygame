@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 표면용 팔레트 + 하늘 전용 팔레트를 후처리 머티리얼에 넣는다. OKLab 값도 미리 계산해 넘긴다.
+    /// Uploads the surface palette and sky-only palette to the post-process material, including precomputed OKLab values.
     [ExecuteAlways]
     public class PixelPalette : MonoBehaviour
     {
@@ -10,20 +10,20 @@ namespace FlyJam
 
         [SerializeField] Material postMaterial;   // M_PixelArtPost
 
-        [Tooltip("땅·물체가 쓸 수 있는 색")]
+        [Tooltip("Colors allowed for ground and object surfaces")]
         [SerializeField] string[] surfaceHex =
         {
-            "#0a0a18", "#17152c", "#2b2740", "#4c4a60",   // 밤·그림자
-            "#807e92", "#b9b6c0", "#fff1c0",              // 중성·하이라이트
-            "#1f4a38", "#2f6b3a", "#4f9a4a", "#a8d860", "#d8f0a0",   // 풀·잎 (+ 밝은 연두)
-            "#4a2a26", "#7a4a2e", "#b8743a",              // 흙·나무
-            "#e8a860", "#c8372d", "#7a1f2c",              // 파리
-            "#ff8fb3", "#c04f78",                         // 짝
-            "#f08a2a", "#ffcf5a",                         // 석양·빛
-            "#2f4f8f", "#4f86c6",                         // 물
+            "#0a0a18", "#17152c", "#2b2740", "#4c4a60",   // Night / shadows
+            "#807e92", "#b9b6c0", "#fff1c0",              // Neutrals / highlights
+            "#1f4a38", "#2f6b3a", "#4f9a4a", "#a8d860", "#d8f0a0",   // Grass / foliage (+ bright lime highlight)
+            "#4a2a26", "#7a4a2e", "#b8743a",              // Dirt / wood
+            "#e8a860", "#c8372d", "#7a1f2c",              // Fly
+            "#ff8fb3", "#c04f78",                         // Mate
+            "#f08a2a", "#ffcf5a",                         // Sunset / glow
+            "#2f4f8f", "#4f86c6",                         // Water
         };
 
-        [Tooltip("하늘에만 쓰는 색 (표면은 이 색이 될 수 없다)")]
+        [Tooltip("Colors reserved for the sky only (surfaces cannot quantize to these)")]
         [SerializeField] string[] skyOnlyHex = { "#9fd0f0" };
 
         static readonly int PaletteId = Shader.PropertyToID("_Palette");
@@ -66,7 +66,7 @@ namespace FlyJam
             return added;
         }
 
-        // sRGB(감마) → OKLab. 셰이더의 OkLab과 같은 식
+        // sRGB (gamma) -> OKLab. Matches OkLab() in the shader.
         static Vector3 OkLab(Color srgb)
         {
             float r = Mathf.GammaToLinearSpace(srgb.r);

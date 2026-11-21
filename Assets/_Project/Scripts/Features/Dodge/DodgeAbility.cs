@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 급선회 회피 (Space). Space+A/D = 옆걸음, Space+S = 뒤로, Space+W = 앞으로, Space 단독 = 가장 가까운 움직이는 장애물 반대쪽.
-    /// SphereWalker의 이동을 잠깐 넘겨받고(BeginOverride), 그동안 무적(SetInvulnerable)을 켠다.
-    /// 이 컴포넌트를 빼면 회피만 사라지고 나머지는 그대로 동작한다.
-    [DefaultExecutionOrder(-10)]   // SphereWalker.Update보다 먼저 입력을 본다
+    /// Quick-turn dodge (Space). Space+A/D = sidestep, Space+S = backstep, Space+W = dash forward, Space alone = sidestep away from nearest moving threat.
+    /// Temporarily overrides SphereWalker movement (BeginOverride) and enables invulnerability (SetInvulnerable).
+    /// Removing this component disables dodging cleanly without affecting any other system.
+    [DefaultExecutionOrder(-10)]   // Reads input before SphereWalker.Update
     public class DodgeAbility : MonoBehaviour
     {
-        [SerializeField] SphereWalker walker;            // 비우면 GameContext.Player
+        [SerializeField] SphereWalker walker;            // Auto-filled from GameContext.Player if null
         [SerializeField] float distance = 2.2f;
         [SerializeField] float duration = 0.22f;
         [SerializeField] float cooldown = 0.7f;

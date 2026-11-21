@@ -42,7 +42,7 @@ namespace FlyJam
 #endif
         }
 
-        /// 급선회 회피, 구애 노래 박자 입력
+        /// Quick-turn dodge and courtship song beat input.
         public static bool DodgePressed()
         {
 #if ENABLE_INPUT_SYSTEM
@@ -53,7 +53,7 @@ namespace FlyJam
 #endif
         }
 
-        /// 픽셀 아트 ON/OFF 비교용 (P키)
+        /// Toggle pixel-art post-processing on/off for comparison (P key).
         public static bool TogglePixelPressed()
         {
 #if ENABLE_INPUT_SYSTEM

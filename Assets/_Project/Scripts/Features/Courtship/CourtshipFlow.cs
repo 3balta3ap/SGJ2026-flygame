@@ -2,15 +2,15 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 짝에게 닿으면: 세션 일시정지 → 입력·짝 멈춤 → 구애 QTE → 성공이면 승리, 실패면 짝이 도망.
-    /// 짝 관련 참조는 비워 두면 MateAI.Current에서 찾는다.
+    /// On touching the mate: pause session -> freeze player & mate -> run courtship QTE -> win on success, mate flees on failure.
+    /// Mate references auto-resolve from MateAI.Current if left empty.
     public class CourtshipFlow : MonoBehaviour
     {
         [SerializeField] CourtshipQTE qte;
-        [SerializeField] GameSession session;                 // 비우면 GameContext에서
-        [SerializeField] SphereWalker player;                 // 비우면 GameContext에서
-        [SerializeField] PlanetFollowCamera followCamera;     // 비우면 GameContext에서
-        [SerializeField] MateAI mateAI;                       // 비우면 MateAI.Current
+        [SerializeField] GameSession session;                 // Auto-filled from GameContext if null
+        [SerializeField] SphereWalker player;                 // Auto-filled from GameContext if null
+        [SerializeField] PlanetFollowCamera followCamera;     // Auto-filled from GameContext if null
+        [SerializeField] MateAI mateAI;                       // Auto-filled from MateAI.Current if null
 
         SphereWalker mate;
         MateGoal mateGoal;
@@ -72,7 +72,7 @@ namespace FlyJam
                 return;
             }
 
-            // 구애 7단계: 암컷은 쫓아오나 시험하려고 도망가기도 한다
+            // Courtship behavior: the female may flee to test the suitor
             if (mateVisibility != null) mateVisibility.ForceVisible = false;
             mateAI.Freeze(false);
             mateAI.Flee();

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 밤이 될수록 halo 렌더러(FlyJam/Halo)의 밝기를 올린다. 하늘 시스템이 없으면 항상 낮.
+    /// Increases halo renderer (FlyJam/Halo) brightness as night falls. Stays daytime if the Sky feature is absent.
     public class NightHalo : MonoBehaviour
     {
         [SerializeField] Renderer halo;

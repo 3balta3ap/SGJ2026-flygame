@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace FlyJam
 {
-    /// Game → Result로 넘기는 결과. 기본 3개 값 + 기능별 통계(키-값).
-    /// 통계 키는 각 기능이 상수로 정한다 (예: "reaction.best"). 결과 화면은 키가 있을 때만 보여준다.
+    /// Round result passed from Game to Result: 3 core fields plus per-feature key-value stats.
+    /// Each feature defines its own stat keys as constants (e.g., "reaction.best"); ResultScreen displays them only when present.
     public static class SessionResult
     {
         public static bool Cleared;

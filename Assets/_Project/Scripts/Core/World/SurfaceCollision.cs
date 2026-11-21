@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 물리 엔진 없이 Blocker 오브젝트에서 밀어낸다. 밀어내는 방향이 접평면이라 자연스럽게 미끄러진다.
+    /// Pushes out of Blocker objects without physics. Pushes along the tangent plane for smooth sliding.
     public static class SurfaceCollision
     {
         public static Vector3 ResolveBlockers(Planet planet, Vector3 pos, float selfRadius, float offset)
@@ -15,7 +15,7 @@ namespace FlyJam
 
                 float min = p.Radius + selfRadius;
                 Vector3 delta = pos - p.transform.position;
-                if (delta.sqrMagnitude > (min + 1f) * (min + 1f)) continue;   // 멀리 있는(반대편 포함) 오브젝트 무시
+                if (delta.sqrMagnitude > (min + 1f) * (min + 1f)) continue;   // Ignore distant objects (including those on the opposite side)
 
                 Vector3 up = planet.UpAt(pos);
                 Vector3 flat = Vector3.ProjectOnPlane(delta, up);

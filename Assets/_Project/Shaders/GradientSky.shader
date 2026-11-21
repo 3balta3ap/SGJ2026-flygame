@@ -52,7 +52,7 @@ Shader "FlyJam/GradientSky"
             fixed4 frag (v2f i) : SV_Target
             {
                 float3 d = normalize(i.dir);
-                float h = dot(d, normalize(_SkyUp.xyz));   // 행성 위 '현재 위치'의 위쪽 기준
+                float h = dot(d, normalize(_SkyUp.xyz));   // Relative to local "up" at current planet position
 
                 float3 col = h >= 0
                     ? lerp(_HorizonColor.rgb, _TopColor.rgb, pow(saturate(h), 0.6))

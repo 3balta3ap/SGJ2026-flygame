@@ -11,10 +11,10 @@ namespace FlyJam
         [SerializeField] float height = 3.3f;
         [SerializeField] float lookAhead = 2.2f;
         [SerializeField] float lookHeight = 0.5f;
-        [SerializeField] float headingFollow = 5f;     // 몸 방향을 따라 도는 속도
+        [SerializeField] float headingFollow = 5f;     // Speed of turning to follow the body heading
         [SerializeField] float positionFollow = 8f;
 
-        [Header("멈추면 둘러보기")]
+        [Header("Look-Out When Stopped")]
         [SerializeField] float lookOutDistance = 12f;
         [SerializeField] float lookOutHeight = 8.25f;
         [SerializeField] float lookOutDelay = 0.35f;
@@ -43,7 +43,7 @@ namespace FlyJam
             if (heading.sqrMagnitude < 1e-4f) heading = Vector3.ProjectOnPlane(target.transform.forward, up);
             heading.Normalize();
 
-            // 몸 기준 조작: 회피 중이 아니면 항상 몸이 보는 방향 뒤로 따라 돈다 (뒷걸음 때는 몸 방향이 그대로라 카메라도 그대로)
+            // Body-relative controls: follow behind the body heading unless dodging (when backing up, body heading stays unchanged so camera stays steady)
             if (target.State != FlyState.Dodging)
             {
                 Vector3 tf = Vector3.ProjectOnPlane(target.transform.forward, up).normalized;

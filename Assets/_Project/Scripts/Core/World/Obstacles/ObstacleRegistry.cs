@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 장애물은 OnEnable에서 Register, OnDisable에서 Unregister 한다.
+    /// Obstacles call Register in OnEnable and Unregister in OnDisable.
     public static class ObstacleRegistry
     {
         static readonly List<IObstacle> obstacles = new List<IObstacle>();

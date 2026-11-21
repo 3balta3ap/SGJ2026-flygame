@@ -5,11 +5,11 @@ namespace FlyJam
 {
     public enum PropKind { Decor, Blocker, Hazard }
 
-    /// 행성 위 오브젝트. Decor = 통과, Blocker = 막힘(미끄러져 돌아감), Hazard = 닿으면 실패.
+    /// Object placed on the planet. Decor = pass-through, Blocker = solid (slides around), Hazard = instant fail on contact.
     public class PlanetProp : MonoBehaviour, IObstacle
     {
         [SerializeField] PropKind kind = PropKind.Decor;
-        [SerializeField] float radius = 0.5f;   // 표면에서의 충돌 반지름
+        [SerializeField] float radius = 0.5f;   // Collision radius on the surface
 
         static readonly List<PlanetProp> all = new List<PlanetProp>();
         public static IReadOnlyList<PlanetProp> All => all;

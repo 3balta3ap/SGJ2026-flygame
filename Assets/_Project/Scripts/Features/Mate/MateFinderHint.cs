@@ -3,13 +3,13 @@ using UnityEngine.UI;
 
 namespace FlyJam
 {
-    /// 플레이어가 멈추면 짝 방향에 하트 표시 (회의 메모 1안 "멈추면 짝 위치를 알 수 있다").
+    /// Displays a heart indicator toward the mate when the player stops moving.
     public class MateFinderHint : MonoBehaviour
     {
-        [SerializeField] Camera worldCamera;        // 비우면 GameContext에서
-        [SerializeField] SphereWalker player;       // 비우면 GameContext에서
-        [SerializeField] Transform mate;            // 비우면 MateAI.Current
-        [SerializeField] GameSession session;       // 비우면 GameContext에서
+        [SerializeField] Camera worldCamera;        // Auto-filled from GameContext if null
+        [SerializeField] SphereWalker player;       // Auto-filled from GameContext if null
+        [SerializeField] Transform mate;            // Auto-filled from MateAI.Current if null
+        [SerializeField] GameSession session;       // Auto-filled from GameContext if null
         [SerializeField] RawImage icon;
         [SerializeField] float showDelay = 0.35f;
         [SerializeField] float fadeSpeed = 6f;

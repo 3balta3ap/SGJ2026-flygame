@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 짝의 '입력'. 걷기 ↔ 멈춤을 번갈아 하며 마을을 돌아다닌다.
-    /// 플레이어에게서 leashAngle 넘게 멀어지면 다음 걷기 방향을 플레이어 쪽으로 튼다.
+    /// Mate movement input: wanders the village alternating between walking and pausing.
+    /// If farther than leashAngle from the player, biases the next walk heading back toward the player.
     public class MateAI : MonoBehaviour, IMoveInput
     {
         public static MateAI Current { get; private set; }

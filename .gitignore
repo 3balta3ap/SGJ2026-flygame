@@ -137,7 +137,7 @@ crashlytics-build.properties
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
 
-# ── macOS (Global/macOS.gitignore 중 일반 항목) ──
+# ── macOS (common entries from Global/macOS.gitignore) ──
 .DS_Store
 .localized
 __MACOSX/
@@ -149,6 +149,6 @@ __MACOSX/
 .idea/
 .vscode/
 
-# ── 이 프로젝트 전용 ──
-# 개인 작업용 Claude 스킬 폴더 (게임 프로젝트와 무관)
+# ── Project-specific ──
+# Personal Claude skills folder (unrelated to the game project)
 /claude-ai-skills/

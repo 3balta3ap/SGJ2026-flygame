@@ -5,17 +5,17 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 코어 상태. 고정된 계약 — 새 기능이 값을 추가하지 않는다 (필요하면 코어 담당과 상의).
+    /// Core fly state. Fixed contract - features must not add values without coordinating with Core.
     public enum FlyState { Stopped, Walking, Dodging, Celebrating, Disabled }
 
-    /// Tank  = 플레이어: 입력 y = 전진(+)/뒷걸음(-), x = 제자리 회전
-    /// Steer = 짝(AI):   입력 (x, y) = 자기 몸 기준으로 가고 싶은 방향, 몸이 그쪽으로 돈다
+    /// Tank  = Player: input y = forward(+)/backward(-), x = turn in place
+    /// Steer = Mate (AI): input (x, y) = desired local movement direction; body turns toward it
     public enum MoveMode { Tank, Steer }
 
-    /// 구체 표면 이동. 회피 같은 능력은 별도 컴포넌트가 BeginOverride로 이동을 잠깐 넘겨받는다.
+    /// Spherical surface locomotion. Abilities like Dodge temporarily take control via BeginOverride.
     public class SphereWalker : MonoBehaviour
     {
-        [SerializeField] Planet planet;                     // 비우면 GameContext에서
+        [SerializeField] Planet planet;                     // Auto-filled from GameContext if null
         [SerializeField] MoveMode moveMode = MoveMode.Tank;
         [SerializeField] bool isPlayer = true;
         [SerializeField] float moveSpeed = 4f;
@@ -36,9 +36,9 @@ namespace FlyJam
         public float CurrentSpeed { get; private set; }
         public float SignedSpeed { get; private set; }
         public float SpeedMultiplier { get; set; } = 1f;
-        /// 어떤 능력이 이동을 넘겨받은 중인가 (회피 등)
+        /// Whether an ability currently overrides movement (e.g., Dodge).
         public bool IsOverridden => overrides.Count > 0;
-        /// 어떤 능력이 무적을 켰는가 (회피 중 장애물 무시)
+        /// Whether an ability currently grants invulnerability (ignores hazards during dodge).
         public bool IsInvulnerable => invulnerable.Count > 0;
         public event Action<FlyState> StateChanged;
 
@@ -52,7 +52,7 @@ namespace FlyJam
         {
             if (planet == null && GameContext.Current != null) planet = GameContext.Current.Planet;
             input = GetComponent<IMoveInput>();
-            if (input == null) Debug.LogWarning("[SphereWalker] IMoveInput 컴포넌트가 없습니다.", this);
+            if (input == null) Debug.LogWarning("[SphereWalker] Missing IMoveInput component.", this);
         }
 
         void Start()
@@ -113,7 +113,7 @@ namespace FlyJam
             SignedSpeed = CurrentSpeed;
         }
 
-        // ── 능력(회피 등)이 쓰는 API ──
+        // ── API for abilities (Dodge, etc.) ──
 
         public void BeginOverride(object by) { if (by != null) overrides.Add(by); }
         public void EndOverride(object by) { if (by != null) overrides.Remove(by); }
@@ -124,14 +124,14 @@ namespace FlyJam
             if (on) invulnerable.Add(by); else invulnerable.Remove(by);
         }
 
-        /// 표면을 따라 이동 + Blocker 충돌 처리
+        /// Moves along the planet surface and resolves Blocker collisions.
         public void MoveBy(Vector3 delta)
         {
             Vector3 p = planet.SnapToSurface(transform.position + delta, surfaceOffset);
             transform.position = SurfaceCollision.ResolveBlockers(planet, p, bodyRadius, surfaceOffset);
         }
 
-        /// 현재 위치의 '위' 축으로 제자리 회전 (도)
+        /// Rotates in place around the local surface up axis (degrees).
         public void TurnAround(float degrees)
         {
             Vector3 up = planet.UpAt(transform.position);
@@ -144,14 +144,14 @@ namespace FlyJam
             transform.rotation = Quaternion.FromToRotation(transform.up, up) * transform.rotation;
         }
 
-        /// 애니메이션·카메라용 속도 값을 능력이 직접 넣을 때
+        /// Allows an overriding ability to set speed values for animation and camera.
         public void SetMotion(float currentSpeed, float signedSpeed)
         {
             CurrentSpeed = currentSpeed;
             SignedSpeed = signedSpeed;
         }
 
-        // ── 기존 API ──
+        // ── Standard API ──
 
         void TurnToward(Vector3 dir, float degPerSec)
         {

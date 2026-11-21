@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 다가오는 장애물이 warnDistance 안에 들어온 순간부터 회피 버튼을 누를 때까지의 시간(게임 시간)을 잰다.
+    /// Measures reaction time (in game time) from when an incoming obstacle enters warnDistance until the player dodges.
     public class ReactionTracker : MonoBehaviour
     {
         public const string BestKey = "reaction.best";
         public const string AvgKey = "reaction.avg";
         public const string CountKey = "reaction.count";
 
-        [SerializeField] Transform player;               // 비우면 GameContext에서
+        [SerializeField] Transform player;               // Auto-filled from GameContext if null
         [SerializeField] float warnDistance = 5f;
         [SerializeField] float expireAfter = 3f;
 

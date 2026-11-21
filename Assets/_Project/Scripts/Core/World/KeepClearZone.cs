@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 이 오브젝트 주변 radius 안에는 마을 오브젝트를 생성하지 않는다 (플레이어·짝 시작점 등).
-    /// 마을 생성기가 플레이어나 짝을 직접 몰라도 되게 하는 표식.
+    /// Prevents village props from spawning within radius around this object (e.g., player/mate spawn points).
+    /// Marker component so VillageGenerator does not need direct references to the player or mate.
     [ExecuteAlways]
     [DefaultExecutionOrder(-500)]
     public class KeepClearZone : MonoBehaviour

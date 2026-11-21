@@ -12,11 +12,11 @@ namespace FlyJam
         public int count = 10;
         public float targetHeight = 3f;
         public Vector2 heightJitter = new Vector2(0.85f, 1.15f);
-        [Tooltip("켜면 모델의 실제 가로·세로 폭으로 충돌 반지름을 잰다 (Rock, Bush 권장)")]
+        [Tooltip("When enabled, measures collision radius from the model's actual horizontal width (recommended for Rock, Bush)")]
         public bool autoFootprint = false;
-        [Tooltip("autoFootprint일 때 충돌 반지름 = 반폭 × 이 값")]
+        [Tooltip("When autoFootprint is enabled: collision radius = half-width * this scale")]
         public float footprintScale = 0.85f;
-        [Tooltip("autoFootprint가 꺼져 있을 때의 수동 반지름 (targetHeight 기준). Tree = 줄기 굵기")]
+        [Tooltip("Manual radius when autoFootprint is disabled (at targetHeight). For trees, use trunk radius")]
         public float footprintRadius = 0.5f;
         public float minSpacing = 1.2f;
     }
@@ -32,7 +32,7 @@ namespace FlyJam
         [SerializeField] float keepClearRadius = 3f;
         [SerializeField] PropRule[] rules;
         [SerializeField] int attemptsPerObject = 30;
-        [Tooltip("모든 오브젝트를 공통으로 더 묻는 깊이")]
+        [Tooltip("Base extra depth to sink all generated props into the surface")]
         [SerializeField] float baseSink = 0.02f;
 
         struct Placed { public Vector3 pos; public float radius; }
@@ -76,11 +76,11 @@ namespace FlyJam
                     go.transform.localRotation = rule.prefab.transform.localRotation;
                     go.transform.localScale = rule.prefab.transform.localScale;
 
-                    // 기울이기 전(프리팹 원래 방향)에 크기와 피벗 위치를 잰다
+                    // Measure bounds and pivot offset before tilting (in prefab's upright orientation)
                     Bounds b0 = MeasureBounds(go);
                     float k = b0.size.y > 1e-4f ? h / b0.size.y : 1f;
                     float halfWidth = Mathf.Max(b0.extents.x, b0.extents.z) * k;
-                    float bottomBelowPivot = (go.transform.position.y - b0.min.y) * k;   // 피벗이 바닥보다 위면 양수
+                    float bottomBelowPivot = (go.transform.position.y - b0.min.y) * k;   // Positive if pivot is above the bottom
 
                     float r = rule.autoFootprint
                         ? halfWidth * rule.footprintScale
@@ -92,7 +92,7 @@ namespace FlyJam
                         continue;
                     }
 
-                    float sinkWidth = rule.autoFootprint ? halfWidth : r;   // 나무는 줄기 폭 기준으로 묻음
+                    float sinkWidth = rule.autoFootprint ? halfWidth : r;   // Trees sink based on trunk radius
                     float offset = bottomBelowPivot - baseSink - CurvatureSink(planet.Radius, sinkWidth);
 
                     go.transform.localScale = rule.prefab.transform.localScale * k;
@@ -135,7 +135,7 @@ namespace FlyJam
             return true;
         }
 
-        /// 폭 w의 평평한 바닥을 반지름 R 구에 놓았을 때 가장자리가 뜨는 높이
+        /// Gap height at the edge when placing a flat base of half-width w onto a sphere of radius R.
         static float CurvatureSink(float R, float w)
         {
             w = Mathf.Min(w, R * 0.9f);

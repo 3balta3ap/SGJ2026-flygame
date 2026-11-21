@@ -2,15 +2,15 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 낮에는 꽃가루, 밤에는 반딧불. 두 파티클을 카메라 앞에 붙여 따라다니게 한다
-    /// (그래서 Main Camera 자식이 아니어도 된다 → SYS_Fx 프리팹으로 뗄 수 있음).
+    /// Pollen by day, fireflies by night. Keeps both particle systems positioned in front of the camera
+    /// (so they do not need to be children of Main Camera and can live inside SYS_Fx.prefab).
     public class AmbientParticles : MonoBehaviour
     {
         [SerializeField] ParticleSystem pollen;
         [SerializeField] ParticleSystem fireflies;
         [SerializeField] float pollenMax = 5f;
         [SerializeField] float firefliesMax = 6f;
-        [SerializeField] Camera worldCamera;                       // 비우면 GameContext에서
+        [SerializeField] Camera worldCamera;                       // Auto-filled from GameContext if null
         [SerializeField] Vector3 cameraOffset = new Vector3(0f, 0f, 6f);
 
         void Start()

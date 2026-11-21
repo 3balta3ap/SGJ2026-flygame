@@ -5,7 +5,7 @@ namespace FlyJam
 {
     public static class ToonMaterials
     {
-        public static Shader ToonShader;   // ToonMaterialSwapper / ToonifyOnSpawn이 인스펙터 참조로 넣는다 (빌드 포함 보장)
+        public static Shader ToonShader;   // Assigned via inspector reference by ToonMaterialSwapper / ToonifyOnSpawn (ensures shader inclusion in builds)
 
         static readonly Dictionary<(Material, float), Material> cache = new Dictionary<(Material, float), Material>();
 
@@ -13,7 +13,7 @@ namespace FlyJam
         {
             if (root == null) return;
             if (ToonShader == null) ToonShader = Shader.Find("FlyJam/Toon");
-            if (ToonShader == null) { Debug.LogError("[ToonMaterials] FlyJam/Toon 셰이더가 없습니다."); return; }
+            if (ToonShader == null) { Debug.LogError("[ToonMaterials] FlyJam/Toon shader is missing."); return; }
 
             foreach (var r in root.GetComponentsInChildren<Renderer>(true))
             {

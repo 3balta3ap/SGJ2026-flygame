@@ -2,12 +2,12 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 플레이어에게서 35~60° 떨어진 곳(대개 지평선 너머)에서 플레이어 쪽으로 굴려 보낸다. 시간이 갈수록 자주.
+    /// Spawns rolling obstacles 35-60 degrees away (usually beyond the horizon) aimed toward the player, faster over time.
     public class ObstacleSpawner : MonoBehaviour
     {
-        [SerializeField] Planet planet;             // 비우면 GameContext에서
-        [SerializeField] SphereWalker player;       // 비우면 GameContext에서
-        [SerializeField] GameSession session;       // 비우면 GameContext에서
+        [SerializeField] Planet planet;             // Auto-filled from GameContext if null
+        [SerializeField] SphereWalker player;       // Auto-filled from GameContext if null
+        [SerializeField] GameSession session;       // Auto-filled from GameContext if null
         [SerializeField] RollingObstacle prefab;
         [SerializeField] float firstDelay = 3f;
         [SerializeField] Vector2 intervalStartEnd = new Vector2(3.5f, 1.4f);

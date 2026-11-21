@@ -3,23 +3,23 @@ using UnityEngine.Rendering;
 
 namespace FlyJam
 {
-    /// 하늘(그라데이션·해·달·별)과 시간대 값을 계산해서 ToonLighting에 넘긴다.
-    /// 이 컴포넌트가 없어도 ToonLighting 기본값(맑은 낮)으로 게임이 돌아간다.
+    /// Computes sky appearance (gradient, sun, moon, stars) and time-of-day lighting, pushing values to ToonLighting.
+    /// Without this component, the game still runs using ToonLighting's clear daytime defaults.
     public class DayNightCycle : MonoBehaviour
     {
         public static DayNightCycle Current { get; private set; }
 
-        [SerializeField] GameSession session;            // 비우면 GameContext에서. 없으면 idleCycleSeconds로 반복
+        [SerializeField] GameSession session;            // Auto-filled from GameContext if null; loops with idleCycleSeconds if absent
         [SerializeField] float idleCycleSeconds = 20f;
-        [SerializeField] Camera worldCamera;             // 비우면 GameContext에서
-        [SerializeField] Planet planet;                  // 비우면 GameContext에서
+        [SerializeField] Camera worldCamera;             // Auto-filled from GameContext if null
+        [SerializeField] Planet planet;                  // Auto-filled from GameContext if null
         [SerializeField] Material skyMaterial;
         [SerializeField] bool useCodeDefaults = true;
         [SerializeField] Gradient topColor, horizonColor, lightColor, ambientColor;
         [SerializeField] AnimationCurve lightIntensity;
         [SerializeField, Range(0.5f, 0.95f)] float nightStart = 35f / 45f;
 
-        [Header("해·달 경로 (카메라가 보는 쪽 하늘 기준, 도)")]
+        [Header("Sun/Moon Arc (Camera-Facing Sky, Degrees)")]
         [SerializeField] float arcAzimuth = 28f;
         [SerializeField] float arcLowElevation = -36f;
         [SerializeField] float arcPeakElevation = -14f;

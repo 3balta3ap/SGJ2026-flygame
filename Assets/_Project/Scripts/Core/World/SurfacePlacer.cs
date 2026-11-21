@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// direction 방향의 행성 표면에 오브젝트를 세운다. 에디터에서도 바로 반영된다.
+    /// Places an object on the planet surface along 'direction'. Updates live in Edit Mode as well.
     [ExecuteAlways]
     public class SurfacePlacer : MonoBehaviour
     {
         [SerializeField] Planet planet;
         [SerializeField] Vector3 direction = Vector3.up;
-        [SerializeField] float offset = 0f;   // 오브젝트 반지름만큼 띄우기
+        [SerializeField] float offset = 0f;   // Vertical offset above the surface (e.g., object radius)
 
         void Start() => Place();
 

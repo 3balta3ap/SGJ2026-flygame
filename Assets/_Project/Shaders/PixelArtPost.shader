@@ -39,12 +39,12 @@ Shader "FlyJam/PixelArtPost"
             float _SS, _Outline, _SkyQuantise, _SkyDither, _SurfaceDither, _Quantise, _FogAfterPalette;
             float _HuePenalty, _LightnessWeight, _DebugLayers;
 
-            float4 _Palette[MAX_COLOURS];      // sRGB 0~1 (앞쪽 _SurfaceCount개 = 표면용, 나머지 = 하늘 전용)
+            float4 _Palette[MAX_COLOURS];      // sRGB 0..1 (first _SurfaceCount = surface colors, rest = sky-only)
             float4 _PaletteLab[MAX_COLOURS];   // OKLab
             float _PaletteSize;
             float _SurfaceCount;
 
-            float4 _FlyFogColor;               // DayNightCycle 전역 값 (지평선 색)
+            float4 _FlyFogColor;               // Global value from ToonLighting/DayNightCycle (horizon color)
 
             struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
@@ -73,7 +73,7 @@ Shader "FlyJam/PixelArtPost"
                 return c;
             }
 
-            // 소스 텍셀 하나: rgb = 감마(sRGB) 공간, a = 층 + 안개
+            // Single source texel: rgb = gamma (sRGB) space, a = layer + fog
             float4 Texel(float2 t)
             {
                 float2 srcSize = _ArtSize.xy * _SS;
@@ -87,7 +87,7 @@ Shader "FlyJam/PixelArtPost"
                 return n == 1 ? cell : cell * 2.0 + float2(k % 2, k / 2);
             }
 
-            // 알파에서 안개 세기 복원: 물체 1.0~0.8, 땅 0.5~0.3
+            // Unpack fog factor from alpha: object 1.0..0.8, ground 0.5..0.3
             float FogOf(float a)
             {
                 return a > 0.75 ? saturate((1.0 - a) / 0.2) : saturate((0.5 - a) / 0.2);
@@ -209,7 +209,7 @@ Shader "FlyJam/PixelArtPost"
                 if (_DebugLayers > 0.5)
                     return Out(layer == 2 ? float3(1, 0.3, 0.3) : (layer == 1 ? float3(0.3, 0.8, 0.3) : float3(0.3, 0.4, 1)));
 
-                // ── 하늘: 기본은 팔레트·디더 없이 원래 색 그대로 ──
+                // ── Sky: output original color without palette quantization or dithering by default ──
                 if (layer == 0)
                 {
                     float3 sum = 0;
@@ -219,7 +219,7 @@ Shader "FlyJam/PixelArtPost"
                     return Out(sky);
                 }
 
-                // ── 땅·물체 ──
+                // ── Ground & Objects ──
                 bool edge = false;
                 if (_Outline > 0.5)
                 {
@@ -231,7 +231,7 @@ Shader "FlyJam/PixelArtPost"
                     edge = lower > 0 && lower < 4;
                 }
 
-                // 이 층에 속한 샘플들의 평균 안개 세기
+                // Average fog factor of samples belonging to this layer
                 float fogSum = 0, fogCnt = 0;
                 for (int f = 0; f < 4; f++)
                     if (f < n && smp[f].a > minA) { fogSum += FogOf(smp[f].a); fogCnt += 1; }
@@ -270,7 +270,7 @@ Shader "FlyJam/PixelArtPost"
                                    : SnapDither(col, cell, _SurfaceDither, (int)_SurfaceCount);
                 }
 
-                // ── 팔레트로 색을 확정한 뒤 안개를 부드럽게 섞는다 ──
+                // ── Blend fog smoothly after palette quantization ──
                 if (_FogAfterPalette > 0.5) col = lerp(col, ToGamma(_FlyFogColor.rgb), fog);
 
                 return Out(col);

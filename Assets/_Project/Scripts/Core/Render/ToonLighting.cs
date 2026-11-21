@@ -2,22 +2,22 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Toon 셰이더·픽셀 후처리가 쓰는 전역 값(_Fly*)을 매 프레임 넣는다.
-    /// 하늘 시스템이 없으면 아래 기본값(맑은 낮)으로 동작한다. 하늘 시스템은 SetTimeOfDay로 값만 넘긴다.
+    /// Pushes global shader values (_Fly*) used by the Toon shader and pixel post-process every frame.
+    /// Without the Sky feature, falls back to the clear daytime defaults below. The Sky feature only pushes values via SetTimeOfDay.
     [DefaultExecutionOrder(1000)]
     public class ToonLighting : MonoBehaviour
     {
         public static ToonLighting Current { get; private set; }
 
         [SerializeField] Planet planet;
-        [SerializeField] Light keyLight;   // Main Camera 자식 Directional Light (방향 + 색·밝기 표시용)
+        [SerializeField] Light keyLight;   // Directional Light under Main Camera (for direction, color, and intensity)
 
-        [Header("기본값 (하늘 시스템이 없을 때)")]
+        [Header("Defaults (When Sky Feature Is Absent)")]
         [SerializeField] Color tint = new Color(1.00f, 0.97f, 0.90f);
         [SerializeField] float exposure = 0.85f;
         [SerializeField] Color fogColor = new Color(0.75f, 0.88f, 1.00f);
 
-        [Header("안개")]
+        [Header("Fog")]
         [SerializeField] float fogStart = 14f;
         [SerializeField] float fogEnd = 30f;
         [SerializeField, Range(0f, 1f)] float fogMax = 0.35f;
@@ -34,7 +34,7 @@ namespace FlyJam
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics() => Current = null;
 
-        /// 하늘 시스템이 매 프레임 호출한다.
+        /// Called every frame by the Sky feature.
         public void SetTimeOfDay(Color newTint, float newExposure, Color newFogColor, float nightFactor)
         {
             tint = newTint;

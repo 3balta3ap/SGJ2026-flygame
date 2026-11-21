@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 4박자 노래. 카운트인 2박 뒤 4박에 맞춰 Space. needed개 이상 맞히면 성공.
-    /// 박자 소리는 코드로 만든 비프음 (사운드 에셋 불필요).
+    /// 4-beat courtship song: press Space on 4 beats after a 2-beat count-in. Hit at least 'needed' beats to succeed.
+    /// Beat audio is synthesized procedurally as sine beeps (no audio assets required).
     public class CourtshipQTE : MonoBehaviour
     {
         [SerializeField] GameObject panel;

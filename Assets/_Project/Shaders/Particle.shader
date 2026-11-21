@@ -5,7 +5,7 @@ Shader "FlyJam/Particle"
         _BaseMap ("Texture", 2D) = "white" {}
         _BaseColor ("Tint", Color) = (1, 1, 1, 1)
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 5    // SrcAlpha
-        [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 10   // OneMinusSrcAlpha (가산 = One)
+        [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 10   // OneMinusSrcAlpha (Additive = One)
     }
     SubShader
     {

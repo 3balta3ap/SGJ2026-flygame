@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 7×6 픽셀 하트 텍스처를 코드로 만든다 (외부 에셋 불필요).
+    /// Procedurally generates a 7x6 pixel heart texture (no external asset required).
     public static class PixelHeart
     {
         static Texture2D cached;

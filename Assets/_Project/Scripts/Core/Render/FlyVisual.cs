@@ -2,25 +2,25 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// SphereWalker의 State와 CurrentSpeed만 읽어서 파리를 코드로 움직인다.
-    /// 나중에 Blender 모델 + Animator로 바꿀 때는 이 컴포넌트만 교체하면 된다.
+    /// Procedurally animates the fly using only SphereWalker.State and CurrentSpeed.
+    /// Replace only this component when switching to a Blender model + Animator later.
     public class FlyVisual : MonoBehaviour
     {
         [SerializeField] SphereWalker walker;
-        /// 겉모습이 뒤돌아 있을 때 다리 위상을 거꾸로 (뒤돌아보기 기능이 설정한다)
+        /// Reverses leg gait phase when the visual faces backward (set by the Backpedal feature).
         public bool ReverseGait { get; set; }
         [SerializeField] Transform bodyRoot;
-        [Tooltip("순서: L1, R1, L2, R2, L3, R3 (1 = 앞다리)")]
+        [Tooltip("Order: L1, R1, L2, R2, L3, R3 (1 = front legs)")]
         [SerializeField] Transform[] legs = new Transform[6];
         [SerializeField] Transform wingL, wingR;
         [SerializeField] Transform antennaL, antennaR;
 
         [Header("Walk")]
-        [SerializeField] float stepsPerUnit = 1.6f;   // 이동 1m당 걸음 사이클 수
+        [SerializeField] float stepsPerUnit = 1.6f;   // Step cycles per meter traveled
         [SerializeField] float legSwingAngle = 25f;
         [SerializeField] float legLiftAngle = 15f;
         [SerializeField] float bodyBob = 0.015f;
-        [SerializeField] bool invertSwing = false;     // 다리가 거꾸로 움직이면 체크
+        [SerializeField] bool invertSwing = false;     // Check if legs swing in the wrong direction
         [SerializeField] bool invertLift = false;
 
         [Header("Idle")]
@@ -34,7 +34,7 @@ namespace FlyJam
         [SerializeField] float wingFlapAngle = 50f;
         [SerializeField] float wingFlapFrequency = 22f;
 
-        [SerializeField] float blend = 12f;            // 포즈 복귀 속도
+        [SerializeField] float blend = 12f;            // Pose blend/return speed
 
         Quaternion[] legRest;
         Quaternion wingLRest, wingRRest, antLRest, antRRest;
@@ -42,9 +42,9 @@ namespace FlyJam
         Vector3 bodyRest;
         float phase, groomTimer, groomT = -1f, twitchTimer;
 
-        // 다리 i가 파리 왼쪽인지 (짝수 인덱스 = L)
+        // Whether leg i is on the fly's left side (even index = L)
         static bool IsLeft(int i) => i % 2 == 0;
-        // 삼각 보행: A조 = L1, R2, L3 (0, 3, 4) / B조 = R1, L2, R3
+        // Tripod gait: Group A = L1, R2, L3 (0, 3, 4) / Group B = R1, L2, R3
         static bool IsTripodA(int i) => i == 0 || i == 3 || i == 4;
 
         void Awake()
@@ -102,7 +102,7 @@ namespace FlyJam
             FoldWings(dt);
             Antennae(dt);
 
-            // 그루밍: 가끔 앞다리 두 개로 얼굴을 닦는다
+            // Grooming: occasionally rubs its face with both front legs
             if (groomT < 0f)
             {
                 groomTimer -= dt;
@@ -117,7 +117,7 @@ namespace FlyJam
                 {
                     float side = IsLeft(i) ? 1f : -1f;
                     float env = Mathf.Sin(groomT * Mathf.PI);                 // 0→1→0
-                    float rub = Mathf.Sin(groomT * Mathf.PI * 8f) * 12f * env; // 비비기
+                    float rub = Mathf.Sin(groomT * Mathf.PI * 8f) * 12f * env; // rubbing motion
                     float yaw = (70f * env + rub) * side * (invertSwing ? -1f : 1f);
                     float roll = 40f * env * -side * (invertLift ? -1f : 1f);
                     target = legRest[i] * Quaternion.Euler(0f, yaw, roll);

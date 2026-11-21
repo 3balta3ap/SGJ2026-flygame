@@ -6,7 +6,7 @@ namespace FlyJam
     public class PixelRenderer : MonoBehaviour
     {
         [SerializeField] Camera worldCamera;
-        [SerializeField] RawImage output;              // 머티리얼 = M_PixelArtPost
+        [SerializeField] RawImage output;              // Material = M_PixelArtPost
         [SerializeField, Range(90, 360)] int artHeight = 200;
         [SerializeField] bool supersample = true;
         [SerializeField] bool pixelOn = true;
@@ -40,7 +40,7 @@ namespace FlyJam
             lastOn = pixelOn; lastSS = supersample; lastW = Screen.width; lastH = Screen.height; lastArtH = artHeight;
 
             Release();
-            worldCamera.allowHDR = false;    // HDR 중간 텍스처는 알파(층)를 잃는다
+            worldCamera.allowHDR = false;    // HDR intermediate textures lose the alpha (layer) channel
             worldCamera.allowMSAA = false;
 
             if (!pixelOn)

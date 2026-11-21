@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// 플레이어가 짝에게 닿으면 MateTouched (보이지 않을 때 닿아도 인정 = '만져서 확인').
+    /// Raises MateTouched when the player reaches the mate (counts even while invisible).
     public class MateGoal : MonoBehaviour
     {
         [SerializeField] Transform player;

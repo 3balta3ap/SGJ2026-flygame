@@ -9,7 +9,7 @@ namespace FlyJam
         public float Radius => radius;
         public Vector3 Center => transform.position;
 
-        /// p 지점에서의 '위' 방향 (행성 중심 반대쪽)
+        /// Surface "up" direction at point p (pointing away from the planet center).
         public Vector3 UpAt(Vector3 p)
         {
             Vector3 d = p - Center;
@@ -20,7 +20,7 @@ namespace FlyJam
 
         public Vector3 SurfacePoint(Vector3 dir, float offset = 0f) => Center + dir.normalized * (radius + offset);
 
-        // Unity 기본 Sphere의 반지름은 0.5 → 스케일 = 반지름 × 2
+        // Unity's default Sphere has radius 0.5 -> scale = radius * 2
         void OnValidate() => transform.localScale = Vector3.one * radius * 2f;
     }
 }

@@ -26,12 +26,12 @@ Shader "FlyJam/Toon"
             float4 _BaseColor;
             float _Layer, _Bands, _Emissive;
 
-            // DayNightCycle이 Shader.SetGlobal*로 넣는 값
+            // Global values pushed by ToonLighting via Shader.SetGlobal*
             float4 _FlyKeyDir;
             float4 _FlyTint;
             float _FlyExposure;
             float4 _FlyPlanetCenter;
-            float4 _FlyFogRange;     // x = 시작 거리, y = 끝 거리, z = 최대 세기
+            float4 _FlyFogRange;     // x = start distance, y = end distance, z = max intensity
 
             struct appdata { float4 vertex : POSITION; float3 normal : NORMAL; float2 uv : TEXCOORD0; };
             struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; float3 wn : TEXCOORD1; float3 wp : TEXCOORD2; };
@@ -62,12 +62,12 @@ Shader "FlyJam/Toon"
                 float3 col = albedo * light * _FlyExposure * _FlyTint.rgb;
                 col *= ndl >= 0.0 ? float3(1.04, 1.0, 0.95) : float3(0.92, 0.95, 1.05);
 
-                // 안개는 여기서 섞지 않는다. 세기만 계산해서 알파에 담고, 후처리가 팔레트 다음에 섞는다.
+                // Do not blend fog here; pack fog factor into alpha so post-processing blends it after palette quantization.
                 float fog = 0.0;
                 if (_Emissive > 0.5) col = albedo * 1.15;
                 else fog = saturate(_FlyFogRange.z * smoothstep(_FlyFogRange.x, _FlyFogRange.y, dist));
 
-                // 알파 = 층 − 0.2 × 안개  (물체 1.0~0.8, 땅 0.5~0.3)
+                // alpha = layer - 0.2 * fog (object 1.0..0.8, ground 0.5..0.3)
                 return fixed4(saturate(col), _Layer - 0.2 * fog);
             }
             ENDCG

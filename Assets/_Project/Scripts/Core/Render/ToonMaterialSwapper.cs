@@ -8,7 +8,7 @@ namespace FlyJam
         public class Target
         {
             public Transform root;
-            [Tooltip("0.5 = 땅 (행성, 연못), 1 = 물체")]
+            [Tooltip("0.5 = Ground (Planet, Pond), 1 = Object")]
             public float layer = 1f;
         }
 

@@ -20,7 +20,7 @@ namespace FlyJam
             if (planet == null && GameContext.Current != null) planet = GameContext.Current.Planet;
             if (planet == null) return;
             float R = planet.Radius;
-            Vector3 center = new Vector3(0f, -R, 0f);   // 로컬 공간에서의 행성 중심
+            Vector3 center = new Vector3(0f, -R, 0f);   // Planet center in local space
 
             var verts = new List<Vector3>();
             var norms = new List<Vector3>();
@@ -38,13 +38,13 @@ namespace FlyJam
                 }
             }
 
-            // 중심 부채꼴
+            // Center triangle fan
             for (int s = 0; s < segments; s++)
             {
                 int cur = 1 + s, next = 1 + (s + 1) % segments;
                 tris.Add(0); tris.Add(next); tris.Add(cur);
             }
-            // 링 사이 사각형
+            // Quads between rings
             for (int r = 1; r < rings; r++)
             {
                 int inner = 1 + (r - 1) * segments, outer = 1 + r * segments;
