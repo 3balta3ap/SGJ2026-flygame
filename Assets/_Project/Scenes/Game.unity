@@ -1113,7 +1113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.PixelRenderer
   worldCamera: {fileID: 789400512}
   output: {fileID: 1149650099}
-  artHeight: 200
+  artHeight: 270
   supersample: 1
   pixelOn: 1
 --- !u!4 &1440871180
