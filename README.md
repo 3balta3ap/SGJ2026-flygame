@@ -97,6 +97,16 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 
 ・滝沢 拓人（プログラマー）
 
+使用された生成AI:
+
+・Gemini 4 Carbon
+
+・Claude
+
+使用されたフリー素材:
+
+・なし
+
 著作権：本作はCreative Commons CC-BY-NC 3.0ライセンスの下で公開されています。本作は2026年11月20日から22日まで開催された、第3回Scientific Game Jam Tokyoで制作されました。本イベントの主催・共催・協力団体は下記の通りです。
 
 <div align="center">
