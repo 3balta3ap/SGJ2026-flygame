@@ -9,7 +9,7 @@
 <h1 align="center">Buzz Life</h1>
 
 <div align="center">
-    <i>Buzz Studio (Scientific Game Jam Tokyo 2026 Team 3)</i>
+    <i>~ from Buzz Studio (Scientific Game Jam Tokyo 2026 Team 3) ~</i>
 </div>
 
 
