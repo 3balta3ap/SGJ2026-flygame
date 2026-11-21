@@ -115,6 +115,9 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 
 </div>
 
+ゲームの背後にある科学: 
+
+1: (未発表) 博士論文、西村和貴、柳原研究室、東京大学、日本
 
 Text: Kazuki Nishimura
 
