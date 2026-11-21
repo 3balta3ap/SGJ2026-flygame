@@ -1,0 +1,9 @@
+{
+    "name": "FlyJam.Hazards",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core",
+        "Unity.TextMeshPro"
+    ],
+    "autoReferenced": true
+}

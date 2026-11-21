@@ -1,0 +1,8 @@
+{
+    "name": "FlyJam.Backpedal",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core"
+    ],
+    "autoReferenced": true
+}

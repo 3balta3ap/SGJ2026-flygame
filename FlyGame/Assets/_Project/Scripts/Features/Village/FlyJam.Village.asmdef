@@ -1,0 +1,8 @@
+{
+    "name": "FlyJam.Village",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core"
+    ],
+    "autoReferenced": true
+}

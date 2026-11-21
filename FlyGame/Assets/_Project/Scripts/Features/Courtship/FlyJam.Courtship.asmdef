@@ -1,0 +1,10 @@
+{
+    "name": "FlyJam.Courtship",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core",
+        "FlyJam.Mate",
+        "Unity.TextMeshPro"
+    ],
+    "autoReferenced": true
+}

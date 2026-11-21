@@ -1,0 +1,9 @@
+{
+    "name": "FlyJam.Mate",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core",
+        "UnityEngine.UI"
+    ],
+    "autoReferenced": true
+}

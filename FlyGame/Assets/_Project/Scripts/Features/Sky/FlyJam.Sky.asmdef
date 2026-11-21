@@ -1,0 +1,8 @@
+{
+    "name": "FlyJam.Sky",
+    "rootNamespace": "FlyJam",
+    "references": [
+        "FlyJam.Core"
+    ],
+    "autoReferenced": true
+}
