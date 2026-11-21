@@ -4,7 +4,8 @@
     "references": [
         "FlyJam.Core",
         "FlyJam.Mate",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "autoReferenced": true
 }

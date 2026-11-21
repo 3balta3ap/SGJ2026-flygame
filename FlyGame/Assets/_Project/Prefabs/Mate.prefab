@@ -111,6 +111,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: e8c69364c5591477f90d2b5d3536538a, type: 2}
     - target: {fileID: 5369702876211011111, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
+      propertyPath: balance
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5369702876211011111, guid: 08d3bcae4e5b24e0ebf08147548d890f, type: 3}
       propertyPath: isPlayer
       value: 0
       objectReference: {fileID: 0}
@@ -214,13 +218,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.MateAI
   self: {fileID: 6411973856404512681}
   player: {fileID: 0}
-  walkTime: {x: 1, y: 2}
-  pauseTime: {x: 2, y: 3.5}
-  wanderTurn: 70
-  leashAngle: 100
+  balance: {fileID: 11400000, guid: c405d5cb97338476cacee6bf7bb22b31, type: 2}
   leashJitter: 30
-  fleeTime: 2
-  fleeSpeedMultiplier: 2
 --- !u!114 &2249260042588705232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,7 +234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.MateGoal
   player: {fileID: 0}
   reachDistance: 0.9
-  retryCooldown: 2
+  rearmDistance: 2.5
 --- !u!114 &8375102173922411711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.MotionBlindVisibility
   walker: {fileID: 6411973856404512681}
   visualRoot: {fileID: 1975330311926721595}
-  motionBlind: 1
+  motionBlind: 0
   popScale: 1.35
   popTime: 0.18
 --- !u!114 &2352228946599988279

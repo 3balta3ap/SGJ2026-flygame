@@ -1,26 +1,32 @@
 using System;
 using System.Collections;
-using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlyJam
 {
-    /// 4-beat courtship song: press Space on 4 beats after a 2-beat count-in. Hit at least 'needed' beats to succeed.
-    /// Beat audio is synthesized procedurally as sine beeps (no audio assets required).
+    /// Courtship panel (S06, P03, E03, A05): press the shown buttons in order.
+    /// All correct -> success. One wrong button (or the time limit, if set) -> failure.
+    /// Each correct press plays a rising note, so it still feels like the courtship song.
+    /// (Class name kept from the prototype's rhythm QTE so CourtshipFlow and the prefab links stay valid.)
     public class CourtshipQTE : MonoBehaviour
     {
+        [SerializeField] CourtshipBalance balance;
         [SerializeField] GameObject panel;
-        [SerializeField] TMP_Text beatsText;
-        [SerializeField] TMP_Text judgeText;
-        [SerializeField] float bpm = 110f;
-        [SerializeField] int notes = 4;
-        [SerializeField] int countIn = 2;
-        [SerializeField] float hitWindow = 0.15f;
-        [SerializeField] int needed = 3;
+        [SerializeField] TMP_Text titleText;          // "順番にボタンを押そう！" -> result title
+        [SerializeField] TMP_Text[] slots;            // button boxes left to right (8 boxes; extra ones are hidden)
+        [SerializeField] GameObject[] slotFrames;     // highlight frame for the next button (same index as slots)
+        [SerializeField] TMP_Text infoText;           // "1／4　次はX" -> failure reason
+        [SerializeField] Image timerFill;             // optional, Image Type = Filled. Hidden when there is no limit
+        [SerializeField] Color doneColor = new Color(0.55f, 0.35f, 0.55f, 1f);
+        [SerializeField] Color nextColor = new Color(0.35f, 0.1f, 0.2f, 1f);
+        [SerializeField] Color todoColor = new Color(0.45f, 0.45f, 0.45f, 1f);
+
+        const string DoneMark = "♪";
 
         AudioSource audioSource;
-        AudioClip tickClip, hitClip;
+        AudioClip wrongClip;
 
         public bool Running { get; private set; }
 
@@ -29,8 +35,7 @@ namespace FlyJam
             if (panel != null) panel.SetActive(false);
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
-            tickClip = MakeBeep(660f, 0.06f);
-            hitClip = MakeBeep(990f, 0.09f);
+            wrongClip = MakeBeep(220f, 0.25f);
         }
 
         public void Begin(Action<bool> onDone)
@@ -42,68 +47,91 @@ namespace FlyJam
         IEnumerator Run(Action<bool> onDone)
         {
             Running = true;
+            int length = balance != null ? balance.Length : 4;
+            int kinds = balance != null ? balance.ButtonKinds : 4;
+            float limit = balance != null ? balance.TimeLimit : 0f;
+            float wait = balance != null ? balance.InputDelay : 0.3f;
+            float left = limit;
+
+            var seq = ButtonSequence.Random(length, kinds);
             panel.SetActive(true);
-            judgeText.text = Loc.Get("court.sing");
+            titleText.text = Loc.Get("court.title");
+            if (timerFill != null) timerFill.gameObject.SetActive(limit > 0f);
+            Refresh(seq);
+            GameEvents.RaiseCourtshipStarted();
 
-            float beat = 60f / bpm;
-            bool[] judged = new bool[notes];
-            int hits = 0;
-            int lastTick = -1;
-            float start = Time.unscaledTime + 0.4f;
-            float end = start + (countIn + notes) * beat + hitWindow;
-
-            while (Time.unscaledTime < end)
+            bool success = false;
+            string failKey = null;
+            while (true)
             {
-                float now = Time.unscaledTime - start;
-                int beatIdx = Mathf.FloorToInt(now / beat);
-
-                if (now >= 0f && beatIdx > lastTick && beatIdx < countIn + notes)
-                {
-                    lastTick = beatIdx;
-                    audioSource.PlayOneShot(tickClip);
-                }
-
-                if (InputCompat.DodgePressed())
-                {
-                    int n = Mathf.RoundToInt(now / beat) - countIn;
-                    bool ok = n >= 0 && n < notes && !judged[n]
-                              && Mathf.Abs(now - (countIn + n) * beat) <= hitWindow;
-                    if (ok)
-                    {
-                        judged[n] = true;
-                        hits++;
-                        audioSource.PlayOneShot(hitClip);
-                        judgeText.text = Loc.Get("court.good");
-                    }
-                    else judgeText.text = Loc.Get("court.miss");
-                }
-
-                int countdown = now < countIn * beat ? Mathf.Clamp(countIn - beatIdx, 1, countIn) : 0;
-                beatsText.text = BuildBeats(beatIdx - countIn, judged, countdown);
                 yield return null;
+                Refresh(seq);                                // button names follow the device in use
+                if (TimeControl.InputBlocked) continue;      // pause menu open
+                float dt = Time.deltaTime;
+                if (wait > 0f) { wait -= dt; continue; }
+
+                if (limit > 0f)
+                {
+                    left -= dt;
+                    if (timerFill != null) timerFill.fillAmount = Mathf.Clamp01(left / limit);
+                    if (left <= 0f) { failKey = "court.fail.time"; break; }
+                }
+
+                if (!InputCompat.FaceButtonPressed(out var pressed)) continue;
+                var step = seq.Submit(pressed);
+                if (step == ButtonSequence.Step.Wrong)
+                {
+                    GameEvents.RaiseCourtshipInput(false);
+                    audioSource.PlayOneShot(wrongClip);
+                    failKey = "court.fail.wrong";
+                    break;
+                }
+                GameEvents.RaiseCourtshipInput(true);
+                audioSource.PlayOneShot(MakeBeep(660f * Mathf.Pow(2f, seq.Index / 6f), 0.12f));
+                if (step == ButtonSequence.Step.Completed)
+                {
+                    success = true;
+                    break;
+                }
             }
 
-            bool success = hits >= needed;
-            judgeText.text = Loc.Get(success ? "court.love" : "court.ranaway");
-            yield return new WaitForSecondsRealtime(0.9f);
+            Refresh(seq);
+            if (timerFill != null) timerFill.gameObject.SetActive(false);
+            titleText.text = Loc.Get(success ? "court.success" : "court.fail.title");
+            infoText.text = success ? "" : Loc.Get(failKey);
+
+            float show = balance != null ? balance.ResultShowSeconds : 1.2f;
+            while (show > 0f)
+            {
+                yield return null;
+                if (!TimeControl.Paused) show -= Time.deltaTime;
+            }
+
             panel.SetActive(false);
             Running = false;
             onDone?.Invoke(success);
         }
 
-        static string BuildBeats(int current, bool[] judged, int countdown)
+        void Refresh(ButtonSequence seq)
         {
-            var sb = new StringBuilder();
-            sb.Append(countdown > 0 ? "<size=60%>" + Loc.Format("court.ready", countdown) + "</size>\n" : "\n");
-            for (int i = 0; i < judged.Length; i++)
+            for (int i = 0; i < slots.Length; i++)
             {
-                if (judged[i]) sb.Append("<color=#FF6FA5>X</color>");
-                else if (i < current) sb.Append("<color=#666666>-</color>");
-                else if (i == current) sb.Append("<color=#FFFFFF><b>O</b></color>");
-                else sb.Append("<color=#AAAAAA>o</color>");
-                sb.Append("   ");
+                bool used = i < seq.Length;
+                if (slots[i] != null)
+                {
+                    slots[i].transform.parent.gameObject.SetActive(used);
+                    if (used)
+                    {
+                        bool done = i < seq.Index;
+                        slots[i].text = done ? DoneMark : InputCompat.Label(seq.Buttons[i]);
+                        slots[i].color = done ? doneColor : i == seq.Index ? nextColor : todoColor;
+                    }
+                }
+                if (slotFrames != null && i < slotFrames.Length && slotFrames[i] != null)
+                    slotFrames[i].SetActive(used && i == seq.Index && !seq.IsComplete);
             }
-            return sb.ToString();
+            if (!seq.IsComplete)
+                infoText.text = Loc.Format("court.progress", seq.Index, seq.Length, InputCompat.Label(seq.Next));
         }
 
         static AudioClip MakeBeep(float freq, float duration)

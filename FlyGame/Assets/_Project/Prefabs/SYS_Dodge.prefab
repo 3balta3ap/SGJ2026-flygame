@@ -45,9 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.DodgeAbility
   walker: {fileID: 0}
-  distance: 2.2
-  duration: 0.22
-  cooldown: 0.7
-  yawKick: 25
-  threatSearchRadius: 6
-  inputDeadZone: 0.1
+  balance: {fileID: 11400000, guid: 5dbf6889d096e4270851789211da76ce, type: 2}

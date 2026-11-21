@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 48, y: 41}
+  m_SizeDelta: {x: 44, y: 38}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5889321635910703362
 CanvasRenderer:
@@ -223,14 +223,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlyJam.MateFinderHint
   worldCamera: {fileID: 0}
   player: {fileID: 0}
-  mate: {fileID: 5567922232669534600}
+  mate: {fileID: 0}
   session: {fileID: 0}
   icon: {fileID: 8047418759025879772}
-  showDelay: 0.35
-  fadeSpeed: 6
-  edgeMargin: 0.06
-  sizeNearFar: {x: 64, y: 36}
-  distanceNearFar: {x: 3, y: 20}
+  headHeight: 0.9
+  maxDistance: 16
+  size: 44
+  bobPixels: 6
+  fadeSpeed: 8
 --- !u!1001 &555221533542242987
 PrefabInstance:
   m_ObjectHideFlags: 0

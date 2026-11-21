@@ -179,7 +179,7 @@ MonoBehaviour:
   - label: Fruit
     prefab: {fileID: 8211086187498787039, guid: 354ac95a1064c44078995c79bf493b0a, type: 3}
     kind: 0
-    count: 6
+    count: 0
     targetHeight: 1.5
     heightJitter: {x: 0.85, y: 1.15}
     autoFootprint: 0

@@ -1,8 +1,9 @@
 {
-    "name": "FlyJam.Backpedal",
+    "name": "FlyJam.Rival",
     "rootNamespace": "FlyJam",
     "references": [
-        "FlyJam.Core"
+        "FlyJam.Core",
+        "Unity.TextMeshPro"
     ],
     "autoReferenced": true
 }
