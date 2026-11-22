@@ -1580,6 +1580,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: SYS_Audio
       objectReference: {fileID: 0}
+    - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
+      propertyPath: levelUp.clip
+      value: 
+      objectReference: {fileID: 8300000, guid: cbaacbbfede944af9b3715e81a81ffd1, type: 3}
+    - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
+      propertyPath: warning.clip
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
+      propertyPath: gameOver.clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 07421748c6e0e4cbd99b6e2407718797, type: 3}
     - target: {fileID: 7221379438266408731, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
