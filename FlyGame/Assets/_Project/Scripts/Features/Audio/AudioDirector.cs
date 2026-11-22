@@ -45,7 +45,7 @@ namespace FlyJam
         [SerializeField] Sfx dodgeSuccess = new Sfx();       // 回避!
         [SerializeField] Sfx dash = new Sfx();               // dash pressed
         [SerializeField] Sfx warning = new Sfx();            // danger warning starts
-        [SerializeField] Sfx courtshipCorrect = new Sfx();   // right button in the dance
+        [SerializeField] Sfx courtshipCorrect = new Sfx();   // fallback clip and volume for accepted notes
         [SerializeField] Sfx courtshipWrong = new Sfx();     // wrong button / time up
         [SerializeField] Sfx rivalPress = new Sfx();         // each press in the mash battle
         [SerializeField] Sfx rivalWin = new Sfx();           // mash battle won
@@ -56,6 +56,12 @@ namespace FlyJam
         [SerializeField] Sfx fever = new Sfx();              // fever starts
         [SerializeField] Sfx bubble = new Sfx();             // speech bubble appears
         [SerializeField] Sfx gameOver = new Sfx();           // HP ran out
+
+        [Header("Courtship Singing")]
+        [SerializeField] AudioClip singDown;
+        [SerializeField] AudioClip singLeft;
+        [SerializeField] AudioClip singRight;
+        [SerializeField] AudioClip singUp;
 
         AudioSource musicSource, sfxSource, jingleSource, battleSource;
         float musicTarget, fadeSpeed;
@@ -96,6 +102,7 @@ namespace FlyJam
             GameEvents.PlayerDodged += OnDash;
             GameEvents.WarningChanged += OnWarning;
             GameEvents.CourtshipInput += OnCourtInput;
+            GameEvents.CourtshipNote += OnCourtNote;
             GameEvents.CourtshipFinished += OnCourtFinished;
             GameEvents.RivalPressed += OnRivalPressed;
             GameEvents.RivalBattleEnded += OnRivalEnded;
@@ -119,6 +126,7 @@ namespace FlyJam
             GameEvents.PlayerDodged -= OnDash;
             GameEvents.WarningChanged -= OnWarning;
             GameEvents.CourtshipInput -= OnCourtInput;
+            GameEvents.CourtshipNote -= OnCourtNote;
             GameEvents.CourtshipFinished -= OnCourtFinished;
             GameEvents.RivalPressed -= OnRivalPressed;
             GameEvents.RivalBattleEnded -= OnRivalEnded;
@@ -218,8 +226,12 @@ namespace FlyJam
 
         void Play(Sfx s)
         {
-            if (s == null || s.clip == null || sfxSource == null) return;
-            sfxSource.PlayOneShot(s.clip, s.volume * sfxVolume);
+            if (s != null) Play(s.clip, s.volume);
+        }
+
+        void Play(AudioClip clip, float volume)
+        {
+            if (clip != null && sfxSource != null) sfxSource.PlayOneShot(clip, volume * sfxVolume);
         }
 
         void OnItem(string id, Vector3 pos) => Play(itemEaten);
@@ -242,7 +254,25 @@ namespace FlyJam
             lastWarn = t;
         }
 
-        void OnCourtInput(bool correct) => Play(correct ? courtshipCorrect : courtshipWrong);
+        void OnCourtInput(bool correct)
+        {
+            if (!correct) Play(courtshipWrong);
+        }
+
+        void OnCourtNote(FaceButton button) => Play(CourtshipClip(button), courtshipCorrect?.volume ?? 1f);
+
+        AudioClip CourtshipClip(FaceButton button)
+        {
+            AudioClip clip = button switch
+            {
+                FaceButton.South => singDown,
+                FaceButton.West => singLeft,
+                FaceButton.East => singRight,
+                FaceButton.North => singUp,
+                _ => null
+            };
+            return clip != null ? clip : courtshipCorrect?.clip;
+        }
         void OnRivalPressed(int count, int target) => Play(rivalPress);
         void OnRivalEnded(bool won)
         {

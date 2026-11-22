@@ -100,6 +100,10 @@ MonoBehaviour:
   gameOver:
     clip: {fileID: 0}
     volume: 1
+  singDown: {fileID: 8300000, guid: fe057ae24f1641a69e6e00bf5390a7da, type: 3}
+  singLeft: {fileID: 8300000, guid: 96ac6a2fba754e2b9a99b0df2d0223e4, type: 3}
+  singRight: {fileID: 8300000, guid: f60c4f8559d74897afe5fa1acc3d46fe, type: 3}
+  singUp: {fileID: 8300000, guid: 1a6a421b551a452d9c6e0597f063f113, type: 3}
 --- !u!114 &2046918583748779018
 MonoBehaviour:
   m_ObjectHideFlags: 0
