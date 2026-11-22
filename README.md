@@ -53,6 +53,8 @@ AI used in this game:
 
 ・Gemini 4 Carbon
 
+・Gemini Neon
+
 ・Claude
 
 Free assets used in this game:
@@ -100,6 +102,8 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 使用された生成AI:
 
 ・Gemini 4 Carbon
+
+・Gemini Neon
 
 ・Claude
 
