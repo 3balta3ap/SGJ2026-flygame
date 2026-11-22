@@ -57,6 +57,8 @@ namespace FlyJam
         IMoveInput input;
         bool inputEnabled = true;
         bool scripted;
+        int movementBudgetFrame = -1;
+        float movementTimeConsumed;
         readonly HashSet<object> overrides = new HashSet<object>();
         readonly HashSet<object> invulnerable = new HashSet<object>();
 
@@ -76,22 +78,30 @@ namespace FlyJam
         void Update()
         {
             TimeInState += Time.deltaTime;
+            UpdateMovement(Time.deltaTime);
+        }
+
+        void UpdateMovement(float dt)
+        {
             if (scripted || IsOverridden) return;
+
+            if (movementBudgetFrame == Time.frameCount) dt = Mathf.Max(0f, dt - movementTimeConsumed);
+            if (dt <= 0f) return;
 
             Vector3 up = planet.UpAt(transform.position);
             bool canControl = inputEnabled && input != null;
             Vector2 raw = canControl ? Vector2.ClampMagnitude(input.ReadMove(), 1f) : Vector2.zero;
 
-            if (moveMode == MoveMode.AutoRun) UpdateAutoRun(raw, canControl, up);
-            else if (moveMode == MoveMode.Tank) UpdateTank(raw, up);
-            else UpdateSteer(raw, up);
+            if (moveMode == MoveMode.AutoRun) UpdateAutoRun(raw, canControl, up, dt);
+            else if (moveMode == MoveMode.Tank) UpdateTank(raw, up, dt);
+            else UpdateSteer(raw, up, dt);
 
             if (State == FlyState.Stopped || State == FlyState.Walking)
                 SetState(Mathf.Abs(SignedSpeed) > 0.01f ? FlyState.Walking : FlyState.Stopped);
         }
 
         /// P01: always forward; x steers with a capped turn rate, so turns become wide arcs. Neutral = straight.
-        void UpdateAutoRun(Vector2 raw, bool canControl, Vector3 up)
+        void UpdateAutoRun(Vector2 raw, bool canControl, Vector3 up, float dt)
         {
             if (!canControl)
             {
@@ -103,29 +113,29 @@ namespace FlyJam
 
             float dead = balance != null ? balance.SteerDeadZone : inputDeadZone;
             float steer = Mathf.Abs(raw.x) > dead ? raw.x : 0f;
-            if (steer != 0f) TurnAround(steer * TurnRate * Time.deltaTime);
+            if (steer != 0f) TurnAround(steer * TurnRate * dt);
 
             float speed = MoveSpeed * SpeedMultiplier;
             Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
-            MoveBy(fwd * speed * Time.deltaTime);
+            MoveBy(fwd * speed * dt);
             AlignToSurface();
 
             CurrentSpeed = speed;
             SignedSpeed = speed;
         }
 
-        void UpdateTank(Vector2 raw, Vector3 up)
+        void UpdateTank(Vector2 raw, Vector3 up, float dt)
         {
             float turn = Mathf.Abs(raw.x) > inputDeadZone ? raw.x : 0f;
             float drive = Mathf.Abs(raw.y) > inputDeadZone ? raw.y : 0f;
 
-            if (turn != 0f) TurnAround(turn * tankTurnSpeed * Time.deltaTime);
+            if (turn != 0f) TurnAround(turn * tankTurnSpeed * dt);
 
             float speed = drive * MoveSpeed * (drive < 0f ? backwardSpeedRatio : 1f) * SpeedMultiplier;
             if (speed != 0f)
             {
                 Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
-                MoveBy(fwd * speed * Time.deltaTime);
+                MoveBy(fwd * speed * dt);
             }
             AlignToSurface();
 
@@ -133,7 +143,7 @@ namespace FlyJam
             SignedSpeed = speed != 0f ? speed : Mathf.Abs(turn) * turnAnimSpeed;
         }
 
-        void UpdateSteer(Vector2 raw, Vector3 up)
+        void UpdateSteer(Vector2 raw, Vector3 up, float dt)
         {
             Vector3 move = Vector3.zero;
             if (raw.magnitude > inputDeadZone)
@@ -144,9 +154,9 @@ namespace FlyJam
             }
 
             CurrentSpeed = move.magnitude * MoveSpeed * SpeedMultiplier;
-            if (CurrentSpeed > 0f) MoveBy(move * MoveSpeed * SpeedMultiplier * Time.deltaTime);
+            if (CurrentSpeed > 0f) MoveBy(move * MoveSpeed * SpeedMultiplier * dt);
             AlignToSurface();
-            if (CurrentSpeed > 0f) TurnToward(move, steerTurnSpeed);
+            if (CurrentSpeed > 0f) TurnToward(move, steerTurnSpeed, dt);
             SignedSpeed = CurrentSpeed;
         }
 
@@ -161,11 +171,25 @@ namespace FlyJam
             if (on) invulnerable.Add(by); else invulnerable.Remove(by);
         }
 
-        /// Moves along the planet surface and resolves Blocker collisions.
-        public void MoveBy(Vector3 delta)
+        /// Accounts for motion already performed by an ability before this frame's normal movement.
+        public void ConsumeMovementTime(float seconds)
         {
-            Vector3 p = planet.SnapToSurface(transform.position + delta, surfaceOffset);
-            transform.position = SurfaceCollision.ResolveBlockers(planet, p, bodyRadius, surfaceOffset);
+            if (movementBudgetFrame != Time.frameCount)
+            {
+                movementBudgetFrame = Time.frameCount;
+                movementTimeConsumed = 0f;
+            }
+            movementTimeConsumed += seconds;
+        }
+
+        /// Moves along the planet surface and resolves Blocker collisions.
+        public void MoveBy(Vector3 delta) => transform.position = PreviewMove(transform.position, delta);
+
+        /// Predicts the same step without moving the walker.
+        public Vector3 PreviewMove(Vector3 position, Vector3 delta)
+        {
+            Vector3 p = planet.SnapToSurface(position + delta, surfaceOffset);
+            return SurfaceCollision.ResolveBlockers(planet, p, bodyRadius, surfaceOffset);
         }
 
         /// Rotates in place around the local surface up axis (degrees).
@@ -190,13 +214,13 @@ namespace FlyJam
 
         // ── Standard API ──
 
-        void TurnToward(Vector3 dir, float degPerSec)
+        void TurnToward(Vector3 dir, float degPerSec, float dt)
         {
             Vector3 up = planet.UpAt(transform.position);
             Vector3 d = Vector3.ProjectOnPlane(dir, up);
             if (d.sqrMagnitude < 1e-6f) return;
             Quaternion target = Quaternion.LookRotation(d.normalized, up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, target, degPerSec * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, target, degPerSec * dt);
         }
 
         public void SetInputEnabled(bool enabled)
