@@ -46,7 +46,7 @@ namespace FlyJam
         [SerializeField] Sfx dash = new Sfx();               // dash pressed
         [SerializeField] Sfx warning = new Sfx();            // danger warning starts
         [SerializeField] Sfx courtshipCorrect = new Sfx();   // fallback clip and volume for accepted notes
-        [SerializeField] Sfx courtshipWrong = new Sfx();     // wrong button / time up
+        [SerializeField] Sfx courtshipWrong = new Sfx();     // fallback clip and volume for wrong notes
         [SerializeField] Sfx rivalPress = new Sfx();         // each press in the mash battle
         [SerializeField] Sfx rivalWin = new Sfx();           // mash battle won
         [SerializeField] Sfx menuMove = new Sfx();           // menu cursor moved
@@ -62,6 +62,7 @@ namespace FlyJam
         [SerializeField] AudioClip singLeft;
         [SerializeField] AudioClip singRight;
         [SerializeField] AudioClip singUp;
+        [SerializeField] AudioClip singFailed;
 
         AudioSource musicSource, sfxSource, jingleSource, battleSource;
         float musicTarget, fadeSpeed;
@@ -256,7 +257,9 @@ namespace FlyJam
 
         void OnCourtInput(bool correct)
         {
-            if (!correct) Play(courtshipWrong);
+            if (correct) return;
+            AudioClip clip = singFailed != null ? singFailed : courtshipWrong?.clip;
+            Play(clip, courtshipWrong?.volume ?? 1f);
         }
 
         void OnCourtNote(FaceButton button) => Play(CourtshipClip(button), courtshipCorrect?.volume ?? 1f);
