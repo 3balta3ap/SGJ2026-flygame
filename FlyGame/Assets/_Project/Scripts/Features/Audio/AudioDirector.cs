@@ -7,6 +7,8 @@ namespace FlyJam
     /// - Music: one looping track for title and game, kept playing across scene changes (DontDestroyOnLoad).
     ///   Pause menu: volume x pauseDuck. Courtship success: music fades out, the victory clip plays once;
     ///   the music comes back on the next scene load (retry / title).
+    ///   Mash battle (male): battleMusic loops from the start while it lasts (main music muted), and is cut off
+    ///   the moment the battle ends; the main music fades back in. Empty battleMusic = no change.
     /// - Effects: one slot per game event (see the field names). Put SYS_Audio in both Title and Game scenes:
     ///   the first one alive stays, later copies remove themselves.
     public class AudioDirector : MonoBehaviour
@@ -30,6 +32,11 @@ namespace FlyJam
         [SerializeField] float musicFadeSeconds = 1f;
         [SerializeField] AudioClip victory;
         [Range(0f, 1f)] [SerializeField] float victoryVolume = 0.8f;
+        [Tooltip("Loops during the mash battle with a male; stops as soon as the battle ends. Empty = keep the main music")]
+        [SerializeField] AudioClip battleMusic;
+        [Range(0f, 1f)] [SerializeField] float battleVolume = 0.7f;
+        [Tooltip("Main music volume during the battle (0 = silent)")]
+        [Range(0f, 1f)] [SerializeField] float battleMainDuck = 0f;
 
         [Header("Effects")]
         [Range(0f, 1f)] [SerializeField] float sfxVolume = 1f;
@@ -50,9 +57,9 @@ namespace FlyJam
         [SerializeField] Sfx bubble = new Sfx();             // speech bubble appears
         [SerializeField] Sfx gameOver = new Sfx();           // HP ran out
 
-        AudioSource musicSource, sfxSource, jingleSource;
+        AudioSource musicSource, sfxSource, jingleSource, battleSource;
         float musicTarget, fadeSpeed;
-        bool musicStopped, paused;
+        bool musicStopped, paused, inBattle;
 
         void Awake()
         {
@@ -72,6 +79,9 @@ namespace FlyJam
             sfxSource.playOnAwake = false;
             jingleSource = gameObject.AddComponent<AudioSource>();
             jingleSource.playOnAwake = false;
+            battleSource = gameObject.AddComponent<AudioSource>();
+            battleSource.loop = true;
+            battleSource.playOnAwake = false;
             StartMusic();
         }
 
@@ -89,6 +99,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished += OnCourtFinished;
             GameEvents.RivalPressed += OnRivalPressed;
             GameEvents.RivalBattleEnded += OnRivalEnded;
+            GameEvents.RivalBattleStarted += OnRivalStarted;
             GameEvents.MenuMoved += OnMenuMoved;
             GameEvents.MenuSelected += OnMenuSelected;
             GameEvents.GamePaused += OnPaused;
@@ -111,6 +122,7 @@ namespace FlyJam
             GameEvents.CourtshipFinished -= OnCourtFinished;
             GameEvents.RivalPressed -= OnRivalPressed;
             GameEvents.RivalBattleEnded -= OnRivalEnded;
+            GameEvents.RivalBattleStarted -= OnRivalStarted;
             GameEvents.MenuMoved -= OnMenuMoved;
             GameEvents.MenuSelected -= OnMenuSelected;
             GameEvents.GamePaused -= OnPaused;
@@ -145,6 +157,7 @@ namespace FlyJam
         void OnSceneLoaded(Scene s, LoadSceneMode mode)
         {
             if (jingleSource != null) jingleSource.Stop();
+            StopBattleMusic();
             StartMusic();
         }
 
@@ -152,8 +165,9 @@ namespace FlyJam
         {
             paused = on;
             if (on) Play(pauseOpen);
+            if (inBattle && battleSource != null) battleSource.volume = battleVolume * (on ? pauseDuck : 1f);
             if (musicStopped) return;
-            musicTarget = musicVolume * (on ? pauseDuck : 1f);
+            musicTarget = MainTarget();
             fadeSpeed = musicVolume * 4f;
         }
 
@@ -164,9 +178,36 @@ namespace FlyJam
             if (musicStopped && musicSource.isPlaying && musicSource.volume <= 0.001f) musicSource.Stop();
         }
 
+        float MainTarget() => musicVolume * (paused ? pauseDuck : 1f) * (inBattle ? battleMainDuck : 1f);
+
+        void OnRivalStarted()
+        {
+            if (battleMusic == null || battleSource == null) return;
+            inBattle = true;
+            battleSource.clip = battleMusic;
+            battleSource.volume = battleVolume * (paused ? pauseDuck : 1f);
+            battleSource.time = 0f;
+            battleSource.Play();
+            if (musicStopped) return;
+            musicTarget = MainTarget();
+            fadeSpeed = musicVolume * 6f;   // main music gets out of the way fast
+        }
+
+        /// Cuts the battle music off at once (battle over, scene change, round end) and brings the main music back.
+        void StopBattleMusic()
+        {
+            if (battleSource != null && battleSource.isPlaying) battleSource.Stop();
+            if (!inBattle) return;
+            inBattle = false;
+            if (musicStopped) return;
+            musicTarget = MainTarget();
+            fadeSpeed = musicVolume / Mathf.Max(0.05f, musicFadeSeconds);
+        }
+
         void OnCourtFinished(bool success, Vector3 pos)
         {
             if (!success) return;
+            StopBattleMusic();
             musicStopped = true;
             musicTarget = 0f;
             fadeSpeed = musicVolume / Mathf.Max(0.05f, musicFadeSeconds);
@@ -203,12 +244,20 @@ namespace FlyJam
 
         void OnCourtInput(bool correct) => Play(correct ? courtshipCorrect : courtshipWrong);
         void OnRivalPressed(int count, int target) => Play(rivalPress);
-        void OnRivalEnded(bool won) { if (won) Play(rivalWin); }
+        void OnRivalEnded(bool won)
+        {
+            StopBattleMusic();
+            if (won) Play(rivalWin);
+        }
         void OnMenuMoved() => Play(menuMove);
         void OnMenuSelected() => Play(menuSelect);
         void OnLevel(int level, int previous) { if (level > previous) Play(levelUp); }
         void OnFever(bool on) { if (on) Play(fever); }
         void OnBubble(string key, int priority) => Play(bubble);
-        void OnDied(string reason) => Play(gameOver);
+        void OnDied(string reason)
+        {
+            StopBattleMusic();
+            Play(gameOver);
+        }
     }
 }

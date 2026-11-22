@@ -52,10 +52,13 @@
 - **`SYS_Mate.prefab`**: 중첩 `Mate.prefab`(`MateAI`+`MateBalance`, `MateGoal`, `MotionBlindVisibility`(motionBlind 끔) …), 자체 `Canvas`(`sortingOrder 11`: `MateHint` + `MateFinderHint` = 머리 위 발견 마크).
 - **`SYS_Courtship.prefab`**: `CourtshipFlow`, `CourtshipQTE`(`CourtshipBalance`, 버튼 순서 입력), 자체 `Canvas`(`sortingOrder 12`: `CourtshipPanel`).
 - **`SYS_Rival.prefab`**: `RivalBattle`(`RivalBalance`, 수컷 접촉 시 연타 배틀), 자체 `Canvas`(`sortingOrder 13`: `RivalPanel`).
-- **`SYS_Fx.prefab`**: `FxDirector`(+ 아이템 먹기), `AmbientParticles`, `DashRingFx`(대시 링), `WindGusts`(바람 줄기), 파티클 6종.
+- **`SYS_Fx.prefab`**: `FxDirector`(+ 아이템 먹기), `AmbientParticles`, `DashRingFx`(대시 링), 파티클 6종.
 - **`SYS_Menu.prefab`**: `PauseMenu`, `ResultPanel`, `EventSystem`, 자체 `Canvas`(`sortingOrder 20`: `PausePanel`·`ResultPanel`, 각각 `MenuNavigator`).
 - **`SYS_UI.prefab`**: HUD `Canvas`(`sortingOrder 0`), `GameHud`(아래 가운데 이동 안내 `Guide`).
 - **생물 모델** (CHI/07): `Fly`·`Mate`·`Enemy_Male`·`Enemy_Spider`·`Enemy_Dragonfly`의 `Visual` 아래는 FBX 모델 인스턴스(`Art/Models/Mdl_*.fbx`, 언팩 안 함). 원본은 `FlyGame/ArtSource/build_creatures.py`(블렌더에서 실행 → `creatures.blend` + FBX 재생성 → 프리팹 자동 반영). 부품 이름·피벗이 곧 애니메이션 계약: 파리 = `BodyRoot`, `LegL1~LegR3`, `WingL/R`, `AntennaL/R`, `EyeL/R`(수컷 밤 눈), `Brows`(라이벌만 켬). 적 모션은 `Features/Hazards/CreatureMotion.cs`(다리·날개·더듬이·몸 출렁, 일시정지 시 정지). 머티리얼은 기존 `Materials/*.mat`을 이름으로 연결(Toon 셰이더는 버텍스 컬러를 안 씀).
+- **하늘** (CHI/08): `GradientSky.shader`가 그라데이션·해·달 + **별**(작은 점 + 반짝이는 큰 별, 밤에만 = `_StarIntensity`) + **구름**(방향 노이즈, 흘러감, 밤엔 남색)을 그린다. 양·크기·속도는 하늘 머티리얼의 Stars/Clouds 속성(`_CloudCover` 0이면 구름 없음).
+- **체력바 그림** (CHI/08): `Art/HPBackGroundBar.png`(빈 칸 = `Frame`), `Clip`(같은 모양 Mask) 안의 `Fill`·`Chip`, `Art/HPEmptyBar.png`(사과 + 테두리 = `Outline`). 9-slice 테두리 (118,0,64,0), 0.6배(높이 72). 길이는 `HealthBar.cs`가 최대 체력으로 정함.
+- **타이틀**: 로고는 `Title.unity`의 `Canvas/TitleImage`에 직접 넣는다(`TitleScreen`은 손대지 않음).
 
 **원칙**: `SYS_*` 프리팹 내부에는 씬 객체 직접 참조가 **0개**다. 런타임에 `GameContext.Current`, `MateAI.Current`, `ToonLighting.Current`로 자동 해석한다. 어떤 `SYS_*`든 비활성화해도 Console 에러 0으로 플레이된다.
 
@@ -74,7 +77,7 @@
 | **v7 (Phase 16)** | `BackpedalFacing`으로 뒷걸음 시 `Fly/Visual`만 180° 회전(`backwardSpeedRatio = 0.7`)해 카메라 회전 없이 얼굴 노출. |
 | **v8 (Phase 17 A~G)** | 죽은 코드 삭제, `GameEvents` partial 5파일 분리, `GameContext`·`ToonLighting`·`KeepClearZone`·`IMovingObstacle` 도입, `GameSession` 슬림화 + `CourtshipFlow`·`DodgeAbility` 분리, `SessionResult` 키-값화, 폴더 재배치 + `.asmdef` 10개, `SYS_*` 프리팹 9개 분리(제거 테스트 통과). |
 | **후속 / v9 작업** | 프로젝트 50개 파일 한글 주석/헤더/툴팁/로그 전체 영문 변환, `ThirdParty/Silver/Silver.ttf`로 `Assets/_Project/Art/Fonts/Silver SDF.asset` 생성(`Dynamic`, `SDFAA`, `1024×1024`), `TMP Settings` 기본 폰트 교체, `Title`·`Result`·`SYS_UI`·`SYS_Hazards`·`SYS_Courtship` 전체 TMP 텍스트 `Silver SDF` 적용(크기 유지, `Bold` 해제), `Title` 우하단 크레딧(`Font: Silver by Poppy Works (CC BY 4.0)`) 추가. |
-| **CHI/01~07 (dev)** | 01 Balance Sync(구글 시트 → `BalanceTable`), 02 EN/JA(`Loc`, `TextTable`), 03 체력, 04 적 3종, 05 기획서 M1~M4 전체(오토런, 패드, 사과, 고정 개체 적, 경고·회피, 연타 배틀, 버튼 순서 구애, 일시정지, 결과 패널. Backpedal·Result 씬 삭제). 06 레벨(EXP·속도·회전·최대 체력 성장, 피버), 앞 대시, 수컷 회피 정지·낮밤 강화, 바나나, 체력 막대 개편, 말풍선, 연못 2곳·잠김, 가시 삭제, 바람·대시 링, 사운드·진동, 타이틀 이미지 칸. 07 로우폴리 생물 모델(블렌더 스크립트 → FBX), 적 모션(CreatureMotion). |
+| **CHI/01~08 (dev)** | 01 Balance Sync(구글 시트 → `BalanceTable`), 02 EN/JA(`Loc`, `TextTable`), 03 체력, 04 적 3종, 05 기획서 M1~M4 전체(오토런, 패드, 사과, 고정 개체 적, 경고·회피, 연타 배틀, 버튼 순서 구애, 일시정지, 결과 패널. Backpedal·Result 씬 삭제). 06 레벨(EXP·속도·회전·최대 체력 성장, 피버), 앞 대시, 수컷 회피 정지·낮밤 강화, 바나나, 체력 막대 개편, 말풍선, 연못 2곳·잠김, 가시 삭제, 바람·대시 링, 사운드·진동, 타이틀 이미지 칸. 07 로우폴리 생물 모델(블렌더 스크립트 → FBX), 적 모션(CreatureMotion). 08 체력바·타이틀 이미지, 하늘 구름·별, 바람 삭제. |
 
 ---
 
