@@ -42,6 +42,7 @@ namespace FlyJam
         bool chasing, dangerous;
         GameSession session;
 
+        internal Transform Visual => visual;
         public Vector3 Position => transform.position;
         public float HitRadius => radius;
         public bool IsMoving => stopLeft <= 0f;

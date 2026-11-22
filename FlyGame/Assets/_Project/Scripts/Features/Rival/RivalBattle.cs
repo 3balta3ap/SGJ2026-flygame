@@ -22,6 +22,7 @@ namespace FlyJam
         [SerializeField] RectTransform timerFill;             // stretched by anchorMax.x = time left / limit
 
         public bool Running { get; private set; }
+        IRivalFightVisual playerVisual, rivalVisual;
 
         void Start()
         {
@@ -36,16 +37,63 @@ namespace FlyJam
         }
 
         void OnEnable() => GameEvents.RivalEncounter += OnEncounter;
-        void OnDisable() => GameEvents.RivalEncounter -= OnEncounter;
+        void OnDisable()
+        {
+            GameEvents.RivalEncounter -= OnEncounter;
+            StopAllCoroutines();
+            if (Running) ReleaseBattle();
+        }
 
         void OnEncounter(IObstacle male)
         {
             if (Running || session == null || player == null) return;
             if (session.Ended || session.IsPaused || player.State == FlyState.Disabled) return;
-            StartCoroutine(Run());
+            StartCoroutine(Run(male));
         }
 
-        IEnumerator Run()
+        void BeginFightPose(IObstacle male)
+        {
+            if (!(male is Component opponent) || player.Planet == null) return;
+            var hero = player.GetComponentInChildren<IRivalFightVisual>();
+            var rival = opponent.GetComponentInChildren<IRivalFightVisual>();
+            if (!VisualActive(hero) || !VisualActive(rival)) return;
+            playerVisual = hero;
+            rivalVisual = rival;
+            if (followCamera != null) followCamera.BeginRivalFight(opponent.transform);
+            hero.BeginFight(player.Planet, opponent.transform, 0f);
+            rival.BeginFight(player.Planet, player.transform, 0.5f);
+        }
+
+        static bool VisualActive(IRivalFightVisual visual) =>
+            visual is Behaviour behaviour && behaviour != null && behaviour.isActiveAndEnabled;
+
+        void LateUpdate()
+        {
+            if (playerVisual == null && rivalVisual == null) return;
+            if (!VisualActive(playerVisual) || !VisualActive(rivalVisual) || session == null || session.Ended)
+                EndFightPose();
+        }
+
+        void EndFightPose()
+        {
+            if (followCamera != null) followCamera.EndRivalFight();
+            if (playerVisual is Object hero && hero != null) playerVisual.EndFight();
+            if (rivalVisual is Object rival && rival != null) rivalVisual.EndFight();
+            playerVisual = null;
+            rivalVisual = null;
+        }
+
+        void ReleaseBattle()
+        {
+            EndFightPose();
+            if (panel != null) panel.SetActive(false);
+            if (followCamera != null) followCamera.SuppressLookOut = false;
+            if (session != null) session.Resume(this);
+            if (player != null && session != null && !session.Ended) player.SetInputEnabled(true);
+            Running = false;
+        }
+
+        IEnumerator Run(IObstacle male)
         {
             Running = true;
             int target = balance != null ? balance.TargetPresses : 25;
@@ -60,6 +108,7 @@ namespace FlyJam
             panel.SetActive(true);
             titleText.text = Loc.Get("rival.title");
             Refresh(count, target, left, limit);
+            BeginFightPose(male);
             GameEvents.RaiseRivalBattleStarted();
 
             bool won;
@@ -82,6 +131,7 @@ namespace FlyJam
             }
 
             left = Mathf.Max(0f, left);
+            EndFightPose();
             Refresh(count, target, left, limit);
             titleText.text = Loc.Get(won ? "rival.win" : "rival.lose");
             promptText.text = "";
@@ -93,11 +143,7 @@ namespace FlyJam
                 if (!TimeControl.Paused) show -= Time.deltaTime;
             }
 
-            panel.SetActive(false);
-            if (followCamera != null) followCamera.SuppressLookOut = false;
-            session.Resume(this);
-            player.SetInputEnabled(true);
-            Running = false;
+            ReleaseBattle();
             GameEvents.RaiseRivalBattleEnded(won);
             if (!won) GameEvents.RaiseDamageRequested(balance != null ? balance.FailDamageRatio : 0.1f, "Hit");
         }
