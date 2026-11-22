@@ -10,7 +10,7 @@ namespace FlyJam
     /// All correct -> success. One wrong button (or the time limit, if set) -> failure.
     /// Difficulty follows the player's level ("Level" table: courtLength, courtTime) when the Level feature is on:
     /// low levels get a long, fast dance that is nearly impossible ("もっと強くならなきゃ…" bubble on failure).
-    /// Sounds: the Audio feature listens to CourtshipInput (no sound code here).
+    /// Sounds: the Audio feature listens to the courtship input and note events.
     /// (Class name kept from the prototype's rhythm QTE so CourtshipFlow and the prefab links stay valid.)
     public class CourtshipQTE : MonoBehaviour
     {
@@ -92,6 +92,7 @@ namespace FlyJam
                     break;
                 }
                 GameEvents.RaiseCourtshipInput(true);
+                GameEvents.RaiseCourtshipNote(pressed);
                 if (step == ButtonSequence.Step.Completed)
                 {
                     success = true;
