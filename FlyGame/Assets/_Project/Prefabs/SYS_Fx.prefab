@@ -6950,7 +6950,6 @@ GameObject:
   - component: {fileID: 3830829508507734137}
   - component: {fileID: 2499066029315946530}
   - component: {fileID: 1393335082576252307}
-  - component: {fileID: 3857333558069313493}
   m_Layer: 0
   m_Name: SYS_Fx
   m_TagString: Untagged
@@ -7043,36 +7042,6 @@ MonoBehaviour:
   segments: 20
   startColor: {r: 1, g: 0.62, b: 0.25, a: 0.6}
   endColor: {r: 1, g: 0.18, b: 0.1, a: 0}
---- !u!114 &3857333558069313493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4192014811547597988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bacfe9930ba7247d29242fc4befc84c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FlyJam.Fx::FlyJam.WindGusts
-  material: {fileID: 2100000, guid: 77f5832477fb448caaee4356fd2c7a34, type: 2}
-  worldCamera: {fileID: 0}
-  pollen: {fileID: 9105255997538938724}
-  interval: {x: 4, y: 8}
-  linesPerGust: {x: 1, y: 2}
-  lifetime: 1.6
-  lineLength: 4
-  sweepWidth: 13
-  depth: {x: 4, y: 7}
-  verticalSpread: 1.6
-  waveAmplitude: 0.18
-  waves: 2.5
-  width: 0.05
-  color: {r: 1, g: 1, b: 1, a: 0.35}
-  points: 24
-  baseAngle: 0
-  angleSwing: 25
-  pollenPush: 2
 --- !u!1 &4521330482229497890
 GameObject:
   m_ObjectHideFlags: 0

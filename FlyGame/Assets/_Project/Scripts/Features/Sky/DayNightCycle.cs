@@ -71,6 +71,10 @@ namespace FlyJam
 
             Color horizon = horizonColor.Evaluate(T);
             skyInstance.SetVector("_SkyUp", up);
+            // Real horizon seen from the camera (small planet: well below the local horizontal) -> GradientSky._HorizonH
+            float camDist = Vector3.Distance(worldCamera.transform.position, planet.Center);
+            float ratio = planet.Radius / Mathf.Max(camDist, planet.Radius + 0.001f);
+            skyInstance.SetFloat("_HorizonH", -Mathf.Sqrt(Mathf.Max(0f, 1f - ratio * ratio)));
             skyInstance.SetColor("_TopColor", topColor.Evaluate(T));
             skyInstance.SetColor("_HorizonColor", horizon);
             skyInstance.SetColor("_BottomColor", horizon * 0.85f);

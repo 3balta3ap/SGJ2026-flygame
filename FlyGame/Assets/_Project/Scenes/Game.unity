@@ -1581,6 +1581,14 @@ PrefabInstance:
       value: SYS_Audio
       objectReference: {fileID: 0}
     - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
+      propertyPath: battleMusic
+      value: 
+      objectReference: {fileID: 8300000, guid: e477cf80278a84d26b20d8b83fa86a71, type: 3}
+    - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
+      propertyPath: battleVolume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6267071300694576765, guid: 65a9ec2a2850b482dbf493364cec9cf6, type: 3}
       propertyPath: levelUp.clip
       value: 
       objectReference: {fileID: 8300000, guid: cbaacbbfede944af9b3715e81a81ffd1, type: 3}
