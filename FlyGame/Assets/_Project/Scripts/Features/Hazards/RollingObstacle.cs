@@ -8,7 +8,7 @@ namespace FlyJam
     /// Per type row (HazardBalance.TypeRow from ObstacleSpawner.Launch): damage, warning, chase, stop-on-hit/dodge, rival,
     /// and day/night strength (male: faster and shorter chase cooldown as days pass and at night).
     /// Freezes while the session is paused (courtship, mash battle, pause menu) - E04.
-    public class RollingObstacle : MonoBehaviour, IMovingObstacle, IDamageSource
+    public class RollingObstacle : MonoBehaviour, IMovingObstacle, IObstacleDodgeMotion, IDamageSource
     {
         static readonly List<RollingObstacle> active = new List<RollingObstacle>();
         static readonly List<RollingObstacle> alive = new List<RollingObstacle>();
@@ -53,6 +53,8 @@ namespace FlyJam
         public bool IsRival => hasRow && row.rival;
         /// Day/night strength multiplier on speed (1 = base). Male: (1 + daySpeedUp x day) x (1 + nightSpeedUp at night).
         public float Strength { get; private set; } = 1f;
+        public float TravelSpeed => speed * Strength;
+        public float StopSecondsAfterDodge => hasRow && row.stopOnDodge > 0f ? row.stopOnDodge : Mathf.Max(0f, stopLeft);
         public bool IsChaseCoolingDown => cooldownLeft > 0f;
         /// Fraction of max HP lost on contact. -1 = let Health use its default. 0 for the male (mash battle instead).
         public float DamageRatio => !hasRow ? -1f : row.rival ? 0f : row.damageRatio;
@@ -179,7 +181,7 @@ namespace FlyJam
             Vector3 up = planet.UpAt(transform.position);
             if (row.chase && target != null) Steer(up);
 
-            float step = speed * Strength * Time.deltaTime;
+            float step = TravelSpeed * Time.deltaTime;
             transform.position = planet.SnapToSurface(transform.position + dir * step, radius);
             up = planet.UpAt(transform.position);
             dir = Vector3.ProjectOnPlane(dir, up).normalized;

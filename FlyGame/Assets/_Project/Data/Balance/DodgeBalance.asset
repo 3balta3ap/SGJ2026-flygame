@@ -15,3 +15,15 @@ MonoBehaviour:
   distance: 3
   duration: 0.3
   cooldown: 0.4
+  frontAngle: 15
+  rearAngle: 20
+  feintStartAngle: 90
+  sideTurnAngle: 90
+  sideTurnSeconds: 0.06
+  sideTurnSpeed: 1.5
+  sideAccelerateSeconds: 0.24
+  sideExitSpeed: 12
+  feintEscapeSeconds: 0.2
+  feintTurnRadius: 1.2
+  feintSpeed: 8
+  feintEndAngle: 135
