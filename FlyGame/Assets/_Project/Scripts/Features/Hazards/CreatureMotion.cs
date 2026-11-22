@@ -5,9 +5,9 @@ namespace FlyJam
     /// Procedural motion for enemy creatures (they have no SphereWalker, so FlyVisual cannot drive them).
     /// Legs walk in two alternating groups while the enemy moves (6 legs = tripod gait like FlyVisual, 8 legs = spider),
     /// the body bobs with the steps, wings buzz (dragonfly: always), antennae sway.
-    /// Legs rest while the enemy is stopped (RollingObstacle.IsMoving false); everything freezes while the session is paused.
+    /// Legs rest while the enemy is stopped. Only a rival fight pose animates during a session pause.
     /// Pivot convention (same as FlyVisual): rest rotation = identity, x = side, y = up, z = forward.
-    public class CreatureMotion : MonoBehaviour
+    public class CreatureMotion : MonoBehaviour, IRivalFightVisual
     {
         [SerializeField] RollingObstacle body;              // empty = this object or a parent
         [Tooltip("Optional: moved up and down with the steps")]
@@ -28,6 +28,7 @@ namespace FlyJam
         [SerializeField] float antennaSway = 10f;
         [SerializeField] float blend = 12f;
 
+        RivalFightPose fight;
         Quaternion[] legRest, wingRest, antRest;
         Vector3 bodyRest;
         float phase, clock;
@@ -50,8 +51,29 @@ namespace FlyJam
             return r;
         }
 
+        public void BeginFight(Planet planet, Transform opponent, float phaseOffset)
+        {
+            EndFight();
+            if (body != null && body.Visual != null && body.Visual != body.transform && body.Visual.IsChildOf(body.transform))
+                fight = new RivalFightPose(body.Visual, bodyRoot, legs, planet, opponent, phaseOffset);
+        }
+
+        public void EndFight()
+        {
+            fight?.Restore();
+            fight = null;
+        }
+
+        void OnDisable() => EndFight();
+
         void LateUpdate()
         {
+            if (fight != null)
+            {
+                ApplyWalkPose(fight.Advance(Time.deltaTime, stepsPerSecond), true, 1f);
+                fight.Apply();
+                return;
+            }
             var ctx = GameContext.Current;
             if (ctx != null && ctx.Session != null && ctx.Session.IsPaused) return;   // frozen with the world (E04)
 
@@ -61,27 +83,7 @@ namespace FlyJam
             clock += dt;
             if (moving) phase += stepsPerSecond * dt * Mathf.PI * 2f;
 
-            for (int i = 0; i < legs.Length; i++)
-            {
-                if (legs[i] == null) continue;
-                if (!moving)
-                {
-                    legs[i].localRotation = Quaternion.Slerp(legs[i].localRotation, legRest[i], k);
-                    continue;
-                }
-                bool groupA = ((i / 2) + (i % 2)) % 2 == 0;     // L1, R2, L3 (, R4) step together
-                float p = phase + (groupA ? 0f : Mathf.PI);
-                float side = i % 2 == 0 ? 1f : -1f;             // left = +1 (same signs as FlyVisual)
-                float swing = Mathf.Sin(p) * legSwingAngle * side;
-                float lift = Mathf.Max(0f, Mathf.Cos(p)) * legLiftAngle * -side;
-                legs[i].localRotation = legRest[i] * Quaternion.Euler(0f, swing, lift);
-            }
-
-            if (bodyRoot != null)
-            {
-                Vector3 target = moving ? bodyRest + Vector3.up * Mathf.Abs(Mathf.Sin(phase)) * bodyBob : bodyRest;
-                bodyRoot.localPosition = moving ? target : Vector3.Lerp(bodyRoot.localPosition, target, k);
-            }
+            ApplyWalkPose(phase, moving, k);
 
             bool buzz = wingsAlways || moving;
             for (int i = 0; i < wings.Length; i++)
@@ -103,6 +105,31 @@ namespace FlyJam
                 if (antennae[i] == null) continue;
                 float s = Mathf.Sin(clock * 3f + i * 1.7f) * antennaSway;
                 antennae[i].localRotation = antRest[i] * Quaternion.Euler(s, 0f, s * 0.5f);
+            }
+        }
+
+        void ApplyWalkPose(float walkPhase, bool moving, float k)
+        {
+            for (int i = 0; i < legs.Length; i++)
+            {
+                if (legs[i] == null) continue;
+                if (!moving)
+                {
+                    legs[i].localRotation = Quaternion.Slerp(legs[i].localRotation, legRest[i], k);
+                    continue;
+                }
+                bool groupA = ((i / 2) + (i % 2)) % 2 == 0;     // L1, R2, L3 (, R4) step together
+                float p = walkPhase + (groupA ? 0f : Mathf.PI);
+                float side = i % 2 == 0 ? 1f : -1f;             // left = +1 (same signs as FlyVisual)
+                float swing = Mathf.Sin(p) * legSwingAngle * side;
+                float lift = Mathf.Max(0f, Mathf.Cos(p)) * legLiftAngle * -side;
+                legs[i].localRotation = legRest[i] * Quaternion.Euler(0f, swing, lift);
+            }
+
+            if (bodyRoot != null)
+            {
+                Vector3 target = moving ? bodyRest + Vector3.up * Mathf.Abs(Mathf.Sin(walkPhase)) * bodyBob : bodyRest;
+                bodyRoot.localPosition = moving ? target : Vector3.Lerp(bodyRoot.localPosition, target, k);
             }
         }
     }

@@ -4,7 +4,7 @@ namespace FlyJam
 {
     /// Procedurally animates the fly using only SphereWalker.State and CurrentSpeed.
     /// Replace only this component when switching to a Blender model + Animator later.
-    public class FlyVisual : MonoBehaviour
+    public class FlyVisual : MonoBehaviour, IRivalFightVisual
     {
         [SerializeField] SphereWalker walker;
         /// Reverses leg gait phase when the visual faces backward (kept for compatibility, unused).
@@ -38,6 +38,7 @@ namespace FlyJam
 
         [SerializeField] float blend = 12f;            // Pose blend/return speed
 
+        RivalFightPose fight;
         Quaternion[] legRest;
         Quaternion wingLRest, wingRRest, antLRest, antRRest;
         Quaternion antLTarget, antRTarget;
@@ -64,6 +65,12 @@ namespace FlyJam
         void LateUpdate()
         {
             float dt = Time.deltaTime;
+            if (fight != null)
+            {
+                ApplyWalkPose(fight.Advance(dt, walker.MoveSpeed * stepsPerUnit));
+                fight.Apply();
+                return;
+            }
             if (Flying && (walker.State == FlyState.Walking || walker.State == FlyState.Stopped))
             {
                 Celebrate(dt);
@@ -79,6 +86,21 @@ namespace FlyJam
             }
         }
 
+        public void BeginFight(Planet planet, Transform opponent, float phaseOffset)
+        {
+            EndFight();
+            if (walker != null && transform != walker.transform && transform.IsChildOf(walker.transform))
+                fight = new RivalFightPose(transform, bodyRoot, legs, planet, opponent, phaseOffset);
+        }
+
+        public void EndFight()
+        {
+            fight?.Restore();
+            fight = null;
+        }
+
+        void OnDisable() => EndFight();
+
         float K(float dt) => 1f - Mathf.Exp(-blend * dt);
 
         void Walk(float dt)
@@ -86,21 +108,26 @@ namespace FlyJam
             groomT = -1f;
             float s = ReverseGait ? -walker.SignedSpeed : walker.SignedSpeed;
             phase += s * stepsPerUnit * dt * Mathf.PI * 2f;
+            ApplyWalkPose(phase);
+            FoldWings(dt);
+            Antennae(dt);
+        }
+
+        void ApplyWalkPose(float walkPhase)
+        {
             float sSign = invertSwing ? -1f : 1f;
             float lSign = invertLift ? -1f : 1f;
 
             for (int i = 0; i < legs.Length; i++)
             {
-                float p = phase + (IsTripodA(i) ? 0f : Mathf.PI);
+                float p = walkPhase + (IsTripodA(i) ? 0f : Mathf.PI);
                 float side = IsLeft(i) ? 1f : -1f;
                 float swing = Mathf.Sin(p) * legSwingAngle * side * sSign;
                 float lift = Mathf.Max(0f, Mathf.Cos(p)) * legLiftAngle * -side * lSign;
                 legs[i].localRotation = legRest[i] * Quaternion.Euler(0f, swing, lift);
             }
 
-            bodyRoot.localPosition = bodyRest + Vector3.up * Mathf.Abs(Mathf.Sin(phase * 2f)) * bodyBob;
-            FoldWings(dt);
-            Antennae(dt);
+            bodyRoot.localPosition = bodyRest + Vector3.up * Mathf.Abs(Mathf.Sin(walkPhase * 2f)) * bodyBob;
         }
 
         void Idle(float dt)
