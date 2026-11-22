@@ -27,4 +27,4 @@ MonoBehaviour:
   - id: banana
     rare: 1
     healRatio: 0.4
-    exp: 3
+    exp: 2

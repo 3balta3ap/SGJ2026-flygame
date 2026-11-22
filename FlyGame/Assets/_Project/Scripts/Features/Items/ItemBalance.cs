@@ -37,7 +37,7 @@ namespace FlyJam
         [SerializeField] TypeRow[] types =
         {
             new TypeRow { id = "apple",  rare = false, healRatio = 0.2f, exp = 1 },
-            new TypeRow { id = "banana", rare = true,  healRatio = 0.4f, exp = 3 },
+            new TypeRow { id = "banana", rare = true,  healRatio = 0.4f, exp = 2 },
         };
 
         public float RespawnDistance => Mathf.Max(0f, respawnDistance);
