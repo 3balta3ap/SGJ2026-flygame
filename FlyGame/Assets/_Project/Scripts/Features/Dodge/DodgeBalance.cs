@@ -19,13 +19,20 @@ namespace FlyJam
         internal const float DefaultSideAccelerateSeconds = 0.24f;
         internal const float DefaultSideExitSpeed = 12f;
         internal const float DefaultFeintEndAngle = 135f;
+        internal const float DefaultForwardDashSeconds = 0.3f;
+        internal const float DefaultForwardDashStartSpeed = 4f;
+        internal const float DefaultForwardDashEndSpeed = 12f;
 
         [Tooltip("Nominal distance along a straight forward dash")]
         [SerializeField] float distance = 3f;
         [Tooltip("Straight forward dash duration in seconds")]
         [SerializeField] float duration = 0.3f;
-        [Tooltip("Seconds before the next dash")]
+        [Tooltip("Shared cooldown in seconds, measured from the start of either action")]
         [SerializeField] float cooldown = 0.4f;
+        [Tooltip("Duration of a forward dash when no warning is active")]
+        [SerializeField, Min(0.01f)] float forwardDashSeconds = DefaultForwardDashSeconds;
+        [SerializeField, Min(0f)] float forwardDashStartSpeed = DefaultForwardDashStartSpeed;
+        [SerializeField, Min(0f)] float forwardDashEndSpeed = DefaultForwardDashEndSpeed;
         [Tooltip("Half-angle from straight ahead for a random sidestep")]
         [SerializeField, Range(0f, 90f)] float frontAngle = DefaultFrontAngle;
         [Tooltip("Half-angle from straight behind for a forward dash")]
@@ -50,6 +57,9 @@ namespace FlyJam
         public float Distance => Mathf.Max(0.1f, distance);
         public float Duration => Mathf.Max(0.05f, duration);
         public float Cooldown => Mathf.Max(0f, cooldown);
+        public float ForwardDashSeconds => Mathf.Max(0.01f, forwardDashSeconds);
+        public float ForwardDashStartSpeed => Mathf.Max(0f, forwardDashStartSpeed);
+        public float ForwardDashEndSpeed => Mathf.Max(ForwardDashStartSpeed, forwardDashEndSpeed);
         public float FrontAngle => Mathf.Clamp(frontAngle, 0f, 90f);
         public float RearAngle => Mathf.Clamp(rearAngle, 0f, 90f);
         public float FeintStartAngle => Mathf.Clamp(feintStartAngle, 90f, 180f - RearAngle);

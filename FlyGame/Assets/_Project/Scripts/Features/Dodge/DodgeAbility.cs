@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Dash (P04). Only while a warning is on (GameEvents.WarningChanged); the action button does nothing otherwise.
-    /// Chooses a sidestep, forward dash, or rear feint from the threat's bearing at the moment of the press.
-    /// Invulnerable during the dash, so it may pass through the enemy.
-    /// Temporarily overrides SphereWalker movement (BeginOverride).
+    /// The action button starts an emergency dodge during a warning or a forward dash otherwise.
+    /// Both override SphereWalker movement. Only an emergency dodge grants protection and raises PlayerDodged.
     [DefaultExecutionOrder(-10)]   // Reads input before SphereWalker.Update
     public class DodgeAbility : MonoBehaviour
     {
@@ -34,8 +32,10 @@ namespace FlyJam
         int phaseCount, phaseIndex;
         float phaseTime, cd;
         Vector3 dir;
+        bool emergencyDodge;
 
-        public bool IsDodging => phaseIndex < phaseCount;
+        bool IsActive => phaseIndex < phaseCount;
+        public bool IsDodging => IsActive && emergencyDodge;
 
         void Start()
         {
@@ -52,44 +52,69 @@ namespace FlyJam
 
         void OnWarning(IMovingObstacle t) => threat = t;
 
-        void Update()
+        void Update() => UpdateAction(Time.deltaTime);
+
+        void UpdateAction(float dt)
         {
             if (walker == null) return;
-            if (cd > 0f) cd -= Time.deltaTime;
-            if (IsDodging) { Tick(Time.deltaTime); return; }
+            if (cd > 0f) cd -= dt;
+            if (IsActive)
+            {
+                // Courtship and rival encounters take control when contact disables player input.
+                if (!emergencyDodge && !walker.InputEnabled) Finish();
+                else Tick(dt);
+                return;
+            }
 
-            if (!HasThreat() || cd > 0f || TimeControl.InputBlocked) return;
+            if (cd > 0f || TimeControl.InputBlocked) return;
             if (!walker.InputEnabled || walker.Input == null || walker.IsOverridden) return;
             if (walker.State == FlyState.Celebrating || walker.State == FlyState.Disabled) return;
             if (!walker.Input.ReadDodge()) return;
 
-            Begin();
+            Begin(dt);
         }
 
         bool HasThreat() => threat != null && !(threat is Object uo && uo == null);
 
-        void Begin()
+        void Begin(float dt)
         {
             Transform t = walker.transform;
             Vector3 up = walker.Planet.UpAt(t.position);
             Vector3 forward = Vector3.ProjectOnPlane(t.forward, up).normalized;
             if (forward == Vector3.zero)
                 forward = Vector3.Cross(t.right, up).normalized;
-            Vector3 enemyStart = threat.Position;
-            Vector3 toThreat = Vector3.ProjectOnPlane(enemyStart - t.position, up);
-            ChoosePath(forward, up, toThreat, enemyStart);
+            phaseIndex = 0;
+            phaseTime = 0f;
+            emergencyDodge = HasThreat();
+            if (emergencyDodge)
+            {
+                Vector3 enemyStart = threat.Position;
+                Vector3 toThreat = Vector3.ProjectOnPlane(enemyStart - t.position, up);
+                ChoosePath(forward, up, toThreat, enemyStart);
+            }
+            else
+            {
+                dir = forward;
+                phaseCount = 1;
+                phases[0] = new Phase(
+                    balance != null ? balance.ForwardDashSeconds : DodgeBalance.DefaultForwardDashSeconds,
+                    balance != null ? balance.ForwardDashStartSpeed : DodgeBalance.DefaultForwardDashStartSpeed,
+                    balance != null ? balance.ForwardDashEndSpeed : DodgeBalance.DefaultForwardDashEndSpeed);
+            }
+
             cd = balance != null ? balance.Cooldown : 0.4f;
             walker.BeginOverride(this);
-            walker.SetInvulnerable(this, true);
-            walker.SetState(FlyState.Dodging);
-            if (walker.IsPlayer) GameEvents.RaisePlayerDodged(t.position, dir);
-            Tick(Time.deltaTime);
+            if (emergencyDodge)
+            {
+                walker.SetInvulnerable(this, true);
+                walker.SetState(FlyState.Dodging);
+                if (walker.IsPlayer) GameEvents.RaisePlayerDodged(t.position, dir);
+            }
+            Tick(dt);
         }
 
         void ChoosePath(Vector3 forward, Vector3 up, Vector3 toThreat, Vector3 enemyStart)
         {
-            phaseIndex = 0;
-            phaseTime = 0f;
             dir = forward;
             float duration = balance != null ? balance.Duration : 0.3f;
             float speed = (balance != null ? balance.Distance : 3f) / duration;
@@ -312,7 +337,7 @@ namespace FlyJam
             Vector3 position = walker.transform.position;
             float used = Advance(ref position, ref dir, ref phaseIndex, ref phaseTime, dt, true);
             walker.ConsumeMovementTime(used);
-            if (!IsDodging) Finish();
+            if (!IsActive) Finish();
         }
 
         float Advance(ref Vector3 position, ref Vector3 heading, ref int index, ref float elapsed, float dt, bool apply)
@@ -359,6 +384,8 @@ namespace FlyJam
             phaseIndex = phaseCount;
             if (walker == null) return;
             walker.EndOverride(this);
+            if (!emergencyDodge) return;
+            emergencyDodge = false;
             walker.SetInvulnerable(this, false);
             if (walker.State == FlyState.Dodging)
                 walker.SetState(FlyState.Stopped);

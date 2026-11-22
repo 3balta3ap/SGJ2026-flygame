@@ -15,6 +15,9 @@ MonoBehaviour:
   distance: 3
   duration: 0.3
   cooldown: 0.4
+  forwardDashSeconds: 0.3
+  forwardDashStartSpeed: 4
+  forwardDashEndSpeed: 12
   frontAngle: 15
   rearAngle: 20
   feintStartAngle: 90
