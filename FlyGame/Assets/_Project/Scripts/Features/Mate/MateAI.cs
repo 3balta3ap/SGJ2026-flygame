@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace FlyJam
 {
-    /// Female movement (C03): roams the planet (walk / short rest); runs away while the player is within fleeRadius,
-    /// goes back to roaming beyond releaseRadius. Speed = MateBalance.speed (absolute).
-    /// Shy below MateBalance.shyUntilLevel (Level feature): bigger flee range, no pull toward the player.
-    /// Freeze() during courtship; Flee() after a failed courtship.
+    /// Alternates resting and short walks, and flees when the player crosses the approach threshold.
+    [DefaultExecutionOrder(-5)] // Set the movement state before SphereWalker reads input.
     public class MateAI : MonoBehaviour, IMoveInput
     {
         public static MateAI Current { get; private set; }
@@ -27,14 +25,13 @@ namespace FlyJam
         [Tooltip("Speech bubble when she stops being shy (the player reached shyUntilLevel). Empty = none")]
         [SerializeField] string notShyBubbleKey = "bubble.mate.near";
 
-        enum Mode { Pause, Walk, Flee, Frozen }
-        Mode mode = Mode.Pause;
+        enum Mode { Idle, Wander, Flee, Frozen }
+        Mode mode = Mode.Idle;
         float timer, forcedFlee;
         Vector3 heading;
-        SphereWalker playerWalker;
 
         public bool IsFleeing => mode == Mode.Flee;
-        /// Shy = keeps far away. Only with the Level feature on (PlayerProgress.Active).
+        /// Retains the existing bubble milestone and leash behavior when the Level feature is on.
         public bool IsShy => balance != null && PlayerProgress.Active && PlayerProgress.Level < balance.ShyUntilLevel;
         bool wasShy;
 
@@ -42,78 +39,95 @@ namespace FlyJam
         {
             if (self == null) self = GetComponent<SphereWalker>();
             var ctx = GameContext.Current;
-            if (ctx != null && ctx.Player != null)
-            {
-                playerWalker = ctx.Player;
-                if (player == null) player = ctx.Player.transform;
-            }
+            if (player == null && ctx != null && ctx.Player != null) player = ctx.Player.transform;
         }
 
         void Start()
         {
             wasShy = IsShy;
             heading = transform.forward;
-            timer = Random.Range(PauseMin, PauseMax);
+            EnterIdle();
         }
 
-        float PauseMin => balance != null ? balance.PauseTimeMin : 0.4f;
-        float PauseMax => balance != null ? balance.PauseTimeMax : 1f;
+        void Update() => UpdateBehavior(Time.deltaTime);
 
-        void Update()
+        void UpdateBehavior(float dt)
         {
-            if (mode == Mode.Frozen || self == null || player == null) return;
-            ApplySpeed();
-            if (SessionPaused()) return;   // E04: mash battle / pause menu - she waits too
+            if (mode == Mode.Frozen || self == null || self.Planet == null || player == null || SessionPaused()) return;
 
-            if (forcedFlee > 0f) forcedFlee -= Time.deltaTime;
-            float dist = Vector3.Distance(transform.position, player.position);
             bool shy = IsShy;
             if (wasShy && !shy && !string.IsNullOrEmpty(notShyBubbleKey)) GameEvents.RaiseBubbleRequested(notShyBubbleKey, 3);
             wasShy = shy;
-            float fleeR = balance == null ? 5f : shy ? balance.ShyFleeRadius : balance.FleeRadius;
-            float releaseR = balance == null ? 8f : shy ? balance.ShyReleaseRadius : balance.ReleaseRadius;
-            bool flee = forcedFlee > 0f || (mode == Mode.Flee ? dist < releaseR : dist <= fleeR);
 
-            if (flee)
-            {
-                mode = Mode.Flee;
-                return;
-            }
+            Planet planet = self.Planet;
+            float maxDistance = Mathf.PI * planet.Radius;
+            int level = PlayerProgress.Level;
+            Vector2 distances = balance != null ? balance.FleeDistancesAtLevel(level) : MateBalance.DefaultFleeDistancesAtLevel(level);
+            float release = Mathf.Min(distances.y, maxDistance);
+            float start = Mathf.Min(distances.x, Mathf.Max(0f, release - 0.5f));
+            float distance = ArcDistance(planet, transform.position, player.position);
+            const float distanceTolerance = 0.0001f;
+
             if (mode == Mode.Flee)
             {
-                mode = Mode.Pause;   // back to roaming after a short rest
-                timer = PauseMin;
+                forcedFlee -= dt;
+                if (forcedFlee <= 0f && distance >= release - distanceTolerance) EnterIdle();
+                return;
             }
 
-            timer -= Time.deltaTime;
-            if (timer > 0f) return;
-
-            if (mode == Mode.Pause)
+            if (distance <= start + distanceTolerance)
             {
-                mode = Mode.Walk;
-                timer = Random.Range(balance != null ? balance.WalkTimeMin : 1.5f, balance != null ? balance.WalkTimeMax : 3f);
+                EnterFlee(0f);
+                return;
+            }
 
-                Vector3 up = self.Planet.UpAt(transform.position);
-                Vector3 playerUp = self.Planet.UpAt(player.position);
-                Vector3 baseDir;
-                float jitter;
-                if (!IsShy && Vector3.Angle(up, playerUp) > (balance != null ? balance.LeashAngle : 100f))
+            timer -= dt;
+            if (timer > 0f) return;
+            if (mode == Mode.Idle) EnterWander();
+            else EnterIdle();
+        }
+
+        static float ArcDistance(Planet planet, Vector3 from, Vector3 to)
+        {
+            Vector3 a = planet.UpAt(from);
+            Vector3 b = planet.UpAt(to);
+            return planet.Radius * Mathf.Atan2(Vector3.Cross(a, b).magnitude, Vector3.Dot(a, b));
+        }
+
+        void EnterIdle()
+        {
+            mode = Mode.Idle;
+            forcedFlee = 0f;
+            timer = Random.Range(balance != null ? balance.PauseTimeMin : 3f, balance != null ? balance.PauseTimeMax : 7f);
+            StopMotion();
+        }
+
+        void EnterWander()
+        {
+            mode = Mode.Wander;
+            timer = Random.Range(balance != null ? balance.WalkTimeMin : 0.5f, balance != null ? balance.WalkTimeMax : 1.5f);
+            SetSpeed(Random.Range(balance != null ? balance.WalkSpeedMin : 1f, balance != null ? balance.WalkSpeedMax : 2f));
+
+            Vector3 up = self.Planet.UpAt(transform.position);
+            Vector3 baseDir = Vector3.ProjectOnPlane(transform.forward, up);
+            float jitter = balance != null ? balance.WanderTurn : 70f;
+            if (!IsShy && Vector3.Angle(up, self.Planet.UpAt(player.position)) > (balance != null ? balance.LeashAngle : 100f))
+            {
+                Vector3 towardPlayer = Vector3.ProjectOnPlane(player.position - transform.position, up);
+                if (towardPlayer.sqrMagnitude >= 1e-6f)
                 {
-                    baseDir = Vector3.ProjectOnPlane(player.position - transform.position, up);
+                    baseDir = towardPlayer;
                     jitter = leashJitter;
                 }
-                else
-                {
-                    baseDir = Vector3.ProjectOnPlane(transform.forward, up);
-                    jitter = balance != null ? balance.WanderTurn : 70f;
-                }
-                heading = Quaternion.AngleAxis(Random.Range(-jitter, jitter), up) * baseDir;
             }
-            else
-            {
-                mode = Mode.Pause;
-                timer = Random.Range(PauseMin, PauseMax);
-            }
+            heading = Quaternion.AngleAxis(Random.Range(-jitter, jitter), up) * baseDir.normalized;
+        }
+
+        void EnterFlee(float seconds)
+        {
+            mode = Mode.Flee;
+            forcedFlee = seconds;
+            SetSpeed(balance != null ? balance.Speed : 4.4f);
         }
 
         static bool SessionPaused()
@@ -122,40 +136,50 @@ namespace FlyJam
             return ctx != null && ctx.Session != null && ctx.Session.IsPaused;
         }
 
-        void ApplySpeed()
+        void SetSpeed(float speed)
         {
-            float speed = balance != null ? balance.Speed : 4.4f;
-            self.SpeedMultiplier = speed / Mathf.Max(0.01f, self.MoveSpeed);
+            if (self != null) self.SpeedMultiplier = speed / Mathf.Max(0.01f, self.MoveSpeed);
+        }
+
+        void StopMotion()
+        {
+            SetSpeed(0f);
+            if (self != null) self.SetMotion(0f, 0f);
         }
 
         public Vector2 ReadMove()
         {
-            if (mode == Mode.Pause || mode == Mode.Frozen || player == null || SessionPaused()) return Vector2.zero;
+            if ((mode != Mode.Wander && mode != Mode.Flee) || self == null || self.Planet == null || player == null || SessionPaused())
+                return Vector2.zero;
+
             Vector3 up = self.Planet.UpAt(transform.position);
+            Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
             Vector3 desired = mode == Mode.Flee ? transform.position - player.position : heading;
             desired = Vector3.ProjectOnPlane(desired, up);
-            if (desired.sqrMagnitude < 1e-6f) return Vector2.zero;
-            desired.Normalize();
-            heading = desired;
-
-            Vector3 fwd = Vector3.ProjectOnPlane(transform.forward, up).normalized;
+            if (desired.sqrMagnitude < 1e-6f)
+            {
+                // At the same or opposite point there is no unique tangent toward or away from the player.
+                desired = Vector3.ProjectOnPlane(heading, up);
+                if (desired.sqrMagnitude < 1e-6f) desired = fwd;
+            }
+            heading = desired.normalized;
             Vector3 right = Vector3.Cross(up, fwd);
-            return new Vector2(Vector3.Dot(desired, right), Vector3.Dot(desired, fwd));
+            return new Vector2(Vector3.Dot(heading, right), Vector3.Dot(heading, fwd));
         }
 
         public bool ReadDodge() => false;
 
         public void Freeze(bool on)
         {
-            mode = on ? Mode.Frozen : Mode.Pause;
-            timer = Random.Range(PauseMin, PauseMax);
+            if (on)
+            {
+                mode = Mode.Frozen;
+                StopMotion();
+            }
+            else EnterIdle();
         }
 
         /// Run away for failFleeSeconds even if the player is not close (failed courtship).
-        public void Flee()
-        {
-            forcedFlee = balance != null ? balance.FailFleeSeconds : 2f;
-            mode = Mode.Flee;
-        }
+        public void Flee() => EnterFlee(balance != null ? balance.FailFleeSeconds : 2f);
     }
 }

@@ -114,7 +114,9 @@ namespace FlyJam
 
         void OnDodged(Vector3 pos, Vector3 dir)
         {
-            if (target == null) return;
+            // The cached warning may still refer to a stopped or passed threat for this frame.
+            // A second press during the same pending approach must not restart its success window.
+            if (target == null || target == dodged || !InDanger(target)) return;
             dodged = target;
             dodgedTimer = balance != null ? balance.SuccessTimeout : 3f;
             if (dodged.OnDodged()) Succeed();   // stopOnDodge (male): it freezes, so the dodge counts right away

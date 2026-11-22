@@ -14,14 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: FlyJam.Mate::FlyJam.MateBalance
   speed: 4.4
   shyUntilLevel: 3
-  shyFleeRadius: 18
-  shyReleaseRadius: 20
-  fleeRadius: 5
-  releaseRadius: 8
+  fleeDistancesLv1: {x: 10, y: 15}
+  fleeDistancesLv5: {x: 8, y: 12}
+  fleeDistancesLv10: {x: 5.5, y: 8}
+  fleeDistancesLv15: {x: 3, y: 5}
   failFleeSeconds: 2
-  walkTimeMin: 1.5
-  walkTimeMax: 3
-  pauseTimeMin: 0.4
-  pauseTimeMax: 1
+  walkTimeMin: 0.5
+  walkTimeMax: 1.5
+  pauseTimeMin: 3
+  pauseTimeMax: 7
+  walkSpeedMin: 1
+  walkSpeedMax: 2
   wanderTurn: 70
   leashAngle: 100
