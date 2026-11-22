@@ -21,7 +21,7 @@ MonoBehaviour:
   successTimeout: 3
   types:
   - id: dragonfly
-    count: 2
+    count: 3
     firstDelay: 2
     speed: 3.4
     damageRatio: 0.2
@@ -75,7 +75,7 @@ MonoBehaviour:
     dayCooldownCut: 0.2
     nightCooldownCut: 0.5
   - id: acorn
-    count: 1
+    count: 3
     firstDelay: 2
     speed: 3.2
     damageRatio: 0.1
