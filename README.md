@@ -33,6 +33,8 @@ How to play:
 
 4. The mate (female fly) is escaping from Baz as an intended mate candidate. Chasing her, touch her, and sign the courtship song to her with the combinations of face button (A in Xbox gamepad) or direction keys (keyboard)!
 
+5. Baz is damaging time by time without any foods. Keep correcting the foods on the field!
+
 Visuals: 
 
 <div align="center">
