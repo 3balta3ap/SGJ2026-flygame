@@ -19,9 +19,13 @@
 </div>
 
 
-Pitch: You're Baz 'The Fly' from now! Find your foods and mates to be alive! Walk away from your pursuers to save you longer!
+Pitch:
 
-How to play: a gamepad or a keyboard. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
+You're Baz 'The Fly' from now! Find your foods and mates to be alive! Walk away from your pursuers to save you longer!
+
+How to play:
+
+a gamepad or a keyboard. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
 
 Visuals: 
 
@@ -65,9 +69,13 @@ Free assets used in this game:
 
 ・NA
 
-License: This game is licensed under Creative Commons CC-BY-NC 3.0.
+License:
 
-Science behind Buzz Life: What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
+This game is licensed under Creative Commons CC-BY-NC 3.0.
+
+Science behind Buzz Life:
+
+What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
 
 1: [Unpublished] PhD project of Kazuki Nishimura, Yanagihara Lab, UTokyo, Japan.
 
@@ -132,7 +140,9 @@ BuzzLifeは羽化したばかりのオスのショウジョウバエである「
 
 ・なし
 
-著作権：本作はCreative Commons CC-BY-NC 3.0ライセンスの下で公開されています。本作は2026年11月20日から22日まで開催された、第3回Scientific Game Jam Tokyoで制作されました。本イベントの主催・共催・協力団体は下記の通りです。
+著作権：
+
+本作はCreative Commons CC-BY-NC 3.0ライセンスの下で公開されています。本作は2026年11月20日から22日まで開催された、第3回Scientific Game Jam Tokyoで制作されました。本イベントの主催・共催・協力団体は下記の通りです。
 
 <div align="center">
 
