@@ -79,7 +79,7 @@ Free assets used in this game:
 
 License:
 
-This game is licensed under Creative Commons CC-BY-NC 3.0.
+This game is licensed under Creative Commons CC-BY-NC 3.0. This game was created in The 3rd Scientific Game Jam Tokyo 2026, from Nov. 20 to Nov. 22. Organizations bellow are co-hosting this event.
 
 <div align="center">
 
