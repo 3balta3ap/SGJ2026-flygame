@@ -27,9 +27,11 @@ How to play:
 
 1. Baz keeps moving forward without any interactions. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
 
-2. Other male fly is chasing Baz. Fight with face button (A in Xbox gamepad) or SPACE (keyboard) to win the mate!
+2. Other male fly is chasing Baz. Fight with drumrolling face button (A in Xbox gamepad) or SPACE (keyboard) to win the mate!
 
-3. 
+3. Baz can sense the female fly with its odors. Heart indicator shows female location.
+
+4. The mate (female fly) is escaping from Baz as an intended mate candidate. Chasing her, touch her, and sign the courtship song to her with the combinations of face button (A in Xbox gamepad) or direction keys (keyboard)!
 
 Visuals: 
 
@@ -104,9 +106,11 @@ BuzzLifeは羽化したばかりのオスのショウジョウバエである「
 
 2. 追いかけてくるオスに追いつかれると喧嘩フェーズに入り、XboxコントローラーのAボタン、またはキーボードのSPACEキーの連打で喧嘩を制することができます。
 
-3. メスに接触すると求愛フェーズに入り、コントローラーの指定されたボタンか方向キーの指定されたキーの組み合わせで求愛歌を成功させるとクリアです。
+3. バズは匂いでメスの位置がわかります。メスの位置はハートマークで表示されます。
 
-4. バズの体力は時間経過とともに減少していきます。食べ物に接触することで体力を回復することができます。
+4. メスに接触すると求愛フェーズに入り、コントローラーの指定されたボタンか方向キーの指定されたキーの組み合わせで求愛歌を成功させるとクリアです。
+
+5. バズの体力は時間経過とともに減少していきます。食べ物に接触することで体力を回復することができます。
 
 ビジュアル・トレーラー：
 
