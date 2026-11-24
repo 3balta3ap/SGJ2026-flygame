@@ -73,6 +73,12 @@ License:
 
 This game is licensed under Creative Commons CC-BY-NC 3.0.
 
+<div align="center">
+
+<img src="./Bandeau-logo-SGJ-Japan-2026.png" />
+
+</div>
+
 Science behind Buzz Life:
 
 What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
