@@ -15,7 +15,7 @@
 <h1 align="center">Buzz Life</h1>
 
 <div align="center">
-    <i>~ from Buzz Studio (Team 3, Scientific Game Jam Tokyo 2026) ~</i>
+    <i>~ from Buzz Studio ~</i>
 </div>
 
 
