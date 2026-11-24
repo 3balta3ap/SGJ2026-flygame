@@ -21,7 +21,7 @@
 
 Pitch: You're Baz 'The Fly' from now! Find your foods and mates to be alive! Walk away from your pursuers to save you longer!
 
-How to play: Touch Pad. Use stick to manipulate the fly!
+How to play: a gamepad or a keyboard. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
 
 Visuals: 
 
@@ -55,9 +55,11 @@ AI used in this game:
 
 ・Gemini 4 Carbon
 
-・Gemini Neon
+・Gemini 4 Neon
 
 ・Claude
+
+・Codex
 
 Free assets used in this game:
 
@@ -65,15 +67,16 @@ Free assets used in this game:
 
 License: This game is licensed under Creative Commons CC-BY-NC 3.0.
 
-Science in this game: What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. To be alive effectively, flies need to avoid its enemies, or its competitors during energy-efficient walking, compared to flying. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
+Science behind Buzz Life: What is obstacle avoidance in walking fly? What could be the contents of its behavior? This game is inspired by those questions in the research of obstacle avoidance in walking fruitfly [1]. Fruitfly, or just 'fly' in this game, is a tiny animal that has incredible maneuvers to be alive its unforgiving nature, including enemies, foods, and mates. In this game, you struggle life as a fly. You can be in hard mode without avoiding obstacles. That can be why flies, or the terrestrial animals needed to develop an ability of estimating future path of its pray or its predator, in other words, prediction.
 
 1: [Unpublished] PhD project of Kazuki Nishimura, Yanagihara Lab, UTokyo, Japan.
 
 ---
 
-ゲーム説明：このゲームではハエの成虫である「バズ」の一生を体験していただきます。羽化したばかりのバズは右も左も分からない新参者！天敵のハエトリグモや、恋のライバルである他のオスバエを避けて、恋人を見つけ出し、過酷な自然環境を生き残れ！
+ゲーム説明：このゲームではハエの成虫である「バズ」の一生を体験していただきます。羽化したばかりのバズは右も左も分からない新参者！天敵のトンボやハエトリグモ、恋のライバルである他のオスバエを避けて、恋人を見つけ出し、過酷な自然環境を生き残れ！
+BuzzLifeは羽化したばかりのオスのショウジョウバエである「バズ」が、天敵や障害物を避けながら食べ物や恋人を探して奮闘する、３Dアクションゲームです。
 
-操作方法：バズ（ハエ）の移動はスティックを使って行います。
+操作方法：バズ（ハエ）は一定速度で前進します。左右の移動は方向キーを使って行います。XboxコントローラーのAボタン、またはキーボードのSPACEキーで加速・回避モーションが行えます。追いかけてくるオスに追いつかれると喧嘩フェーズに入り、XboxコントローラーのAボタン、またはキーボードのSPACEキーの連打で喧嘩を制することができます。また、メスに接触すると求愛フェーズに入り、コントローラーの指定されたボタンか方向キーの指定されたキーの組み合わせで求愛歌を成功させるとクリアです。
 
 ビジュアル・トレーラー：
 
@@ -110,6 +113,8 @@ Science in this game: What is obstacle avoidance in walking fly? What could be t
 ・Gemini Neon
 
 ・Claude
+
+・Codex
 
 使用されたフリー素材:
 
