@@ -15,7 +15,7 @@
 <h1 align="center">Buzz Life</h1>
 
 <div align="center">
-    <i>~ from Buzz Studio (Scientific Game Jam Tokyo 2026 Team 3) ~</i>
+    <i>~ from Buzz Studio (Team 3, Scientific Game Jam Tokyo 2026) ~</i>
 </div>
 
 
@@ -25,7 +25,11 @@ You're Baz 'The Fly' from now! Find your foods and mates to be alive! Walk away 
 
 How to play:
 
-a gamepad or a keyboard. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
+1. Baz keeps moving forward without any interactions. Use direction pad (gamepad) or direction keys (keyboard) to move Baz laterally, or face button (A in Xbox gamepad) or SPACE (keyboard) to accelerate forward or dodge the enemies!
+
+2. Other male fly is chasing Baz. Fight with face button (A in Xbox gamepad) or SPACE (keyboard) to win the mate!
+
+3. 
 
 Visuals: 
 
