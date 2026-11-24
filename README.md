@@ -45,7 +45,9 @@ Visuals:
 
 </div>
 
-Credits: Buzz Studio
+Credits:
+
+Buzz Studio
 
 - Kazuki Nishimura (Scientist)
 
@@ -124,7 +126,9 @@ BuzzLifeは羽化したばかりのオスのショウジョウバエである「
 
 </div>
 
-クレジット：Buzz Studio
+クレジット：
+
+Buzz Studio
 
 ・西村 和貴（サイエンティスト）
 
